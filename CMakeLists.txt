@@ -2,13 +2,13 @@ CMake_Minimum_Required(VERSION 2.8)
 Project(DynamicHooks)
 
 Set(HEADER_FILES
-    src/api.h
+    src/DynamicHooks.h
     src/asm.h
     src/utilities.h
 )
 
 Set(SOURCE_FILES
-    src/api.cpp
+    src/DynamicHooks.cpp
     src/asm.cpp
     src/utilities.cpp
 )

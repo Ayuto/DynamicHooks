@@ -31,12 +31,11 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "api.h"
+#include "DynamicHooks.h"
+using namespace DynamicHooks;
+
 #include "asm.h"
 #include "utilities.h"
-
-#include <iostream>
-using namespace std;
 
 #include "AsmJit.h"
 using namespace AsmJit;

@@ -28,8 +28,8 @@
 * Idea and trampoline code taken from DynDetours (thanks your-name-here).
 */
 
-#ifndef _API_H
-#define _API_H
+#ifndef _DYNAMIC_HOOKS_H
+#define _DYNAMIC_HOOKS_H
 
 // ============================================================================
 // >> INCLUDES
@@ -37,6 +37,7 @@
 #include <list>
 #include <map>
 
+namespace DynamicHooks {
 
 // ============================================================================
 // >> TYPE DEFINITIONS
@@ -134,7 +135,7 @@ public:
 	{
 #ifdef _WIN32
 		if (m_eConvention == CONV_THISCALL && iIndex == 0)
-			return (T) m_pECX;
+			return *(T *) &m_pECX;
 #endif
 
 		unsigned long reg = ((unsigned long) m_pESP) + GetArgument(iIndex)->m_iOffset + 4;
@@ -153,7 +154,7 @@ public:
 #ifdef _WIN32
 		if (m_eConvention == CONV_THISCALL && iIndex == 0)
 		{
-			m_pECX = (void *) value;
+			m_pECX = *(void **) &value;
 			return;
 		}
 #endif
@@ -271,15 +272,11 @@ public:
 // ============================================================================
 // >> GetHookManager
 // ============================================================================
-#ifdef _WIN32
-    #define EXPORT extern "C" __declspec(dllexport)
-#else
-    #define EXPORT extern "C"
-#endif
-
 /*
 	Returns a pointer to a static CHookManager object.
 */
-EXPORT CHookManager* GetHookManager();
+CHookManager* GetHookManager();
 
-#endif // _API_H
+} // namespace DynamicHooks
+
+#endif // _DYNAMIC_HOOKS_H

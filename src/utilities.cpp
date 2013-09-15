@@ -45,6 +45,7 @@
 
 #include "asm.h"
 #include "utilities.h"
+using namespace DynamicHooks;
 
 
 // ============================================================================

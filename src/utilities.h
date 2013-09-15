@@ -34,20 +34,20 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "api.h"
+#include "DynamicHooks.h"
 
 
 // ============================================================================
 // >> DEFINITIONS
 // ============================================================================
-typedef bool (*HookFn)(HookType_t, CHook*);
+typedef bool (*HookFn)(DynamicHooks::HookType_t, DynamicHooks::CHook*);
 
 
 // ============================================================================
 // >> FUNCTIONS
 // ============================================================================
 int  GetTypeSize(char cType);
-void ParseParams(Convention_t eConvention, char* szParams, Param_t* pParams, Param_t* pRetParam);
+void ParseParams(DynamicHooks::Convention_t eConvention, char* szParams, DynamicHooks::Param_t* pParams, DynamicHooks::Param_t* pRetParam);
 void SetMemPatchable(void* pAddr, size_t size);
 void WriteJMP(unsigned char* src, void* dest);
 

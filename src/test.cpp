@@ -34,7 +34,8 @@
 #include <iostream>
 using namespace std;
 
-#include "api.h"
+#include "DynamicHooks.h"
+using namespace DynamicHooks;
 
 
 // ============================================================================
