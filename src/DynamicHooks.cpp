@@ -240,10 +240,12 @@ Param_t* CHook::GetArgument(int iIndex)
 // ============================================================================
 // >> GetHookManager
 // ============================================================================
+namespace DynamicHooks {
 CHookManager* GetHookManager()
 {
-    static CHookManager* s_pManager = new CHookManager();
+    static CHookManager* s_pManager = new CHookManager;
     return s_pManager;
+}
 }
 
 
