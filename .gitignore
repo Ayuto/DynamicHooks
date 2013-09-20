@@ -1,12 +1,1 @@
-DynamicHooks.dir/*
-Debug/*
-Release/*
-CMakeFiles/*
-WIN32/*
-*vcxproj*
-*.sln
-ipch/*
-*.suo
-CMakeCache.txt
-*.sdf
-*.cmake
+Build/*

@@ -274,8 +274,9 @@ void Write_SaveRegisters(Assembler& a, CHook* pHook)
 	a.mov(dword_ptr_abs(&pHook->m_pESP), esp);
 
 #ifdef _WIN32
-	// On Windows the this pointer is saved in ecx
-	a.mov(dword_ptr_abs(&pHook->m_pECX), ecx);
+	if (pHook->m_eConvention == CONV_THISCALL)
+		// On Windows the this pointer is saved in ecx
+		a.mov(dword_ptr_abs(&pHook->m_pECX), ecx);
 #endif
 }
 
@@ -377,6 +378,15 @@ void* CreateBridge(CHook* pHook)
 	Write_CallHandler(a, pHook, HOOKTYPE_PRE);
 	a.cmp(eax, true);
 	a.je(label_override);
+
+#ifdef _WIN32
+	// Restore ecx, because it changes either in the global hook handler ('cause of the loop)
+	// or in a registered hook handler (through SetArgument). That's a problem if the trampoline
+	// requires a valid this pointer -- e.g. if it uses virtual functions of its class.
+	// TODO: Add a Write_RestorePreservedRegisters()
+	if (pHook->m_eConvention == CONV_THISCALL)
+		a.mov(ecx, dword_ptr_abs(&pHook->m_pECX));
+#endif
 
 	// Jump to the trampoline
 	a.jmp(pHook->m_pTrampoline);
