@@ -37,8 +37,8 @@ Endif()
 
 If(WIN32)
     Target_Link_Libraries(DynamicHooks
-        debug src/thirdparty/AsmJit/lib/AsmJit_d
-        optimized src/thirdparty/AsmJit/lib/AsmJit
+        debug ../src/thirdparty/AsmJit/lib/AsmJit_d
+        optimized ../src/thirdparty/AsmJit/lib/AsmJit
     )
 Else()
     If(CMAKE_BUILD_TYPE MATCHES Debug)

@@ -171,8 +171,9 @@ CHook::~CHook()
 	// Free the trampoline array
 	free(m_pTrampoline);
 
-	// Free the asm bridge
+	// Free the asm bridge and new return address
 	MemoryManager::getGlobal()->free(m_pBridge);
+	MemoryManager::getGlobal()->free(m_pNewRetAddr);
 }
 
 void CHook::AddCallback(HookType_t eHookType, void* pCallback)
@@ -240,12 +241,13 @@ Param_t* CHook::GetArgument(int iIndex)
 // ============================================================================
 // >> GetHookManager
 // ============================================================================
-namespace DynamicHooks {
-CHookManager* GetHookManager()
+namespace DynamicHooks
 {
-    static CHookManager* s_pManager = new CHookManager;
-    return s_pManager;
-}
+	CHookManager* GetHookManager()
+	{
+		static CHookManager* s_pManager = new CHookManager;
+		return s_pManager;
+	}
 }
 
 
@@ -336,8 +338,7 @@ void* CreatePostCallback(CHook* pHook)
 	// Jump to the original return address
 	a.jmp(dword_ptr_abs(&pHook->m_pRetAddr));
 
-	// TODO: Free this if the bridge gets freed or figure out how to get the
-	//       address of labels.
+	// Generate the code
 	return a.make();
 }
 
@@ -360,7 +361,9 @@ void Write_ModifyReturnAddress(Assembler& a, CHook* pHook)
 	a.mov(edx, dword_ptr_abs(&pEDX));
 
 	// Override the return address. This is a redirect to our post-hook code
-	a.mov(dword_ptr(esp), imm((sysint_t) CreatePostCallback(pHook)));
+	void* pNewRetAddr = CreatePostCallback(pHook);
+	pHook->m_pNewRetAddr = pNewRetAddr;
+	a.mov(dword_ptr(esp), imm((sysint_t) pNewRetAddr));
 }
 
 void* CreateBridge(CHook* pHook)
