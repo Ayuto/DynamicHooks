@@ -1,7 +1,7 @@
 /**
 * =============================================================================
 * DynamicHooks
-* Copyright (C) 2013 Robin Gohmert. All rights reserved.
+* Copyright (C) 2015 Robin Gohmert. All rights reserved.
 * =============================================================================
 *
 * This software is provided 'as-is', without any express or implied warranty.
@@ -34,8 +34,7 @@
 #include <iostream>
 using namespace std;
 
-#include "DynamicHooks.h"
-using namespace DynamicHooks;
+#include "manager.h"
 
 
 // ============================================================================
@@ -59,9 +58,10 @@ int MyFunc(int x, int y)
 
 bool MyHook(HookType_t eHookType, CHook* pHook)
 {
-	cout << pHook->GetArgument<int>(0) << " hook func " << pHook->GetArgument<int>(1) << endl;
-	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
-	pHook->SetReturnValue<int>(20);
+	cout << "MyHook " << eHookType << endl;
+	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 8) << endl;
+	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 4) << endl;
+	//pHook->m_pRegisters->SetValue<int>(pHook->m_pRegisters->m_eax, 1337);
 	return false;
 }
 
@@ -80,9 +80,9 @@ public:
 
 bool MyHook2(HookType_t eHookType, CHook* pHook)
 {
-	cout << pHook->GetArgument<int>(1) << " hook func " << pHook->GetArgument<int>(2) << endl;
-	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
-	pHook->SetReturnValue<int>(20);
+	cout << "MyHook2" << endl;
+	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 8) << endl;
+	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 4) << endl;
 	return false;
 }
 
@@ -103,12 +103,16 @@ int main()
 		CDECL test
 	*/
 	cout << "CDECL test" << endl;
-	pHook = pHookMngr->HookFunction((void *) &MyFunc, CONV_CDECL, "ii)i");
-	pHook->AddCallback(HOOKTYPE_PRE, (void *) &MyHook);
-	pHook->AddCallback(HOOKTYPE_POST, (void *) &MyHook);
+
+	std::list<Register_t> registers;
+	registers.push_back(ESP);
+	registers.push_back(EAX);
+
+	pHook = pHookMngr->HookFunction((void *) &MyFunc, 0, registers);
+	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook);
+	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
 
 	cout << "End result: " << MyFunc(3, 10) << endl << endl;
-
 	
 	/*
 		THISCALL test
@@ -117,13 +121,17 @@ int main()
 	int (__thiscall Entity::*func)(int, int) = &Entity::AddHealth;
 	void* pFunc = (void *&) func;
 
-	pHook = pHookMngr->HookFunction(pFunc, CONV_THISCALL, "pii)i");
-	pHook->AddCallback(HOOKTYPE_PRE, (void *) &MyHook2);
-	pHook->AddCallback(HOOKTYPE_POST, (void *) &MyHook2);
+	std::list<Register_t> regs;
+	regs.push_back(ESP);
+	regs.push_back(EAX);
+	regs.push_back(ECX);
+
+	pHook = pHookMngr->HookFunction(pFunc, 8, regs);
+	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook2);
+	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook2);
 
 	Entity e;
 	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
-
 
 	/*
 		Clean Up

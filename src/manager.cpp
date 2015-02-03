@@ -28,13 +28,67 @@
 * Idea and trampoline code taken from DynDetours (thanks your-name-here).
 */
 
-#ifndef _UTILITIES_H
-#define _UTILITIES_H
+// ============================================================================
+// >> INCLUDES
+// ============================================================================
+#include "manager.h"
+
 
 // ============================================================================
-// >> FUNCTIONS
+// >> CHookManager
 // ============================================================================
-void SetMemPatchable(void* pAddr, size_t size);
-void WriteJMP(unsigned char* src, void* dest);
+CHook* CHookManager::HookFunction(void* pFunc, int iPopSize, std::list<Register_t> vecRegistersToSave)
+{
+	if (!pFunc)
+		return NULL;
 
-#endif // _UTILITIES_H
+	CHook* pHook = FindHook(pFunc);
+	if (pHook)
+		return pHook;
+	
+	pHook = new CHook(pFunc, iPopSize, vecRegistersToSave);
+	m_Hooks.push_back(pHook);
+	return pHook;
+}
+
+void CHookManager::UnhookFunction(void* pFunc)
+{
+	CHook* pHook = FindHook(pFunc);
+	if (pHook)
+	{
+		m_Hooks.remove(pHook);
+		delete pHook;
+	}
+}
+
+CHook* CHookManager::FindHook(void* pFunc)
+{
+	if (!pFunc)
+		return NULL;
+
+	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
+	{
+		CHook* pHook = *it;
+		if (pHook->m_pFunc == pFunc)
+			return pHook;
+	}
+	return NULL;
+}
+
+void CHookManager::UnhookAllFunctions()
+{
+	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
+		delete *it;
+
+	m_Hooks.clear();
+}
+
+
+// ============================================================================
+// >> GetHookManager
+// ============================================================================
+CHookManager* GetHookManager()
+{
+	static CHookManager* s_pManager = new CHookManager;
+	return s_pManager;
+}

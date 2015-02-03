@@ -1,7 +1,7 @@
 /**
 * =============================================================================
 * DynamicHooks
-* Copyright (C) 2013 Robin Gohmert. All rights reserved.
+* Copyright (C) 2015 Robin Gohmert. All rights reserved.
 * =============================================================================
 *
 * This software is provided 'as-is', without any express or implied warranty.
@@ -44,81 +44,6 @@
 #endif
 
 #include "asm.h"
-#include "utilities.h"
-using namespace DynamicHooks;
-
-
-// ============================================================================
-// >> GetTypeSize
-// ============================================================================
-int GetTypeSize(char cType)
-{
-    switch(cType)
-    {
-        case SIGCHAR_VOID:      return 0;
-        case SIGCHAR_BOOL:
-        case SIGCHAR_CHAR:
-        case SIGCHAR_UCHAR:
-        case SIGCHAR_SHORT:
-        case SIGCHAR_USHORT:
-        case SIGCHAR_INT:       return sizeof(int);
-        case SIGCHAR_UINT:      return sizeof(unsigned int);
-        case SIGCHAR_LONG:      return sizeof(long);
-        case SIGCHAR_ULONG:     return sizeof(unsigned long);
-        case SIGCHAR_LONGLONG:  return sizeof(long long);
-        case SIGCHAR_ULONGLONG: return sizeof(unsigned long long);
-        case SIGCHAR_FLOAT:     return sizeof(float);
-        case SIGCHAR_DOUBLE:    return sizeof(double);
-        case SIGCHAR_POINTER:   return sizeof(void *);
-        case SIGCHAR_STRING:    return sizeof(char *);
-    }
-
-    // TODO: Throw exception here
-    return 0;
-}
-
-
-// ============================================================================
-// >> ParseParams
-// ============================================================================
-void ParseParams(Convention_t eConvention, char* szParams, Param_t* pParams, Param_t* pRetParam)
-{
-	Param_t* param = pParams;
-	char* ptr = szParams;
-	char ch;
-	int offset = 0;
-
-#ifdef _WIN32
-		if (eConvention == CONV_THISCALL)
-			offset -= sizeof(void *);
-#endif
-
-	while ((ch = *ptr) != '\0' && ch != ')')
-	{
-		ptr++;
-		if (ch == SIGCHAR_VOID)
-			continue;
-
-		int size = GetTypeSize(ch);
-		param->m_cParam = ch;
-		param->m_iOffset = offset;
-		param->m_iSize = size;
-		param = param->m_pNext = new Param_t;
-		offset += size;
-	}
-
-	param->m_pNext = NULL;
-	
-	if(ch == '\0')
-		ch = SIGCHAR_VOID;
-	else
-		ch = *++ptr;
-
-	pRetParam->m_cParam  = ch;
-	pRetParam->m_iOffset = 0;
-	pRetParam->m_iSize   = GetTypeSize(ch);
-	pRetParam->m_pNext   = NULL;
-}
 
 
 // ============================================================================
