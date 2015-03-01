@@ -31,6 +31,51 @@
 #ifndef _REGISTERS_H
 #define _REGISTERS_H
 
+#include <stdlib.h>
+
+class CRegister
+{
+public:
+	CRegister(int iSize)
+	{
+		m_iSize = iSize;
+		m_pAddress = malloc(iSize);
+	}
+
+	~CRegister()
+	{
+		free(m_pAddress);
+	}
+
+	template<class T>
+	T GetValue()
+	{
+		return *(T *) m_pAddress;
+	}
+
+	template<class T>
+	T GetPointerValue(int iOffset=0)
+	{
+		return *(T *) (GetValue<unsigned long>() + iOffset);
+	}
+
+	template<class T>
+	void SetValue(T value)
+	{
+		*(T *) m_pAddress = value;
+	}
+
+	template<class T>
+	void SetPointerValue(T value, int iOffset=0)
+	{
+		SetValue<T>(GetValue<unsigned long>() + iOffset, value);
+	}
+
+public:
+	int m_iSize;
+	void* m_pAddress;
+};
+
 class CRegisters
 {
 public:
@@ -38,168 +83,155 @@ public:
 	~CRegisters();
 
 public:
-	template<class T>
-	T GetValue(void* pPtr, int iOffset=0)
-	{
-		return *(T *) ((*(unsigned long *) pPtr) + iOffset);
-	}
-
-	template<class T>
-	void SetValue(void* pPtr, T value, int iOffset=0)
-	{
-		*(T *) ((*(unsigned long *) pPtr) + iOffset) = value;
-	}
-
-public:
 	// ========================================================================
 	// >> 8-bit General purpose registers
 	// ========================================================================
-	void* m_al;
-	void* m_cl;
-	void* m_dl;
-	void* m_bl;
+	CRegister* m_al;
+	CRegister* m_cl;
+	CRegister* m_dl;
+	CRegister* m_bl;
 
 	// 64-bit mode only
-	void* m_spl;
-	void* m_bpl;
-	void* m_sil;
-	void* m_dil;
-	void* m_r8b;
-	void* m_r9b;
-	void* m_r10b;
-	void* m_r11b;
-	void* m_r12b;
-	void* m_r13b;
-	void* m_r14b;
-	void* m_r15b;
+	CRegister* m_spl;
+	CRegister* m_bpl;
+	CRegister* m_sil;
+	CRegister* m_dil;
+	CRegister* m_r8b;
+	CRegister* m_r9b;
+	CRegister* m_r10b;
+	CRegister* m_r11b;
+	CRegister* m_r12b;
+	CRegister* m_r13b;
+	CRegister* m_r14b;
+	CRegister* m_r15b;
 
-	void* m_ah;
-	void* m_ch;
-	void* m_dh;
-	void* m_bh;
+	CRegister* m_ah;
+	CRegister* m_ch;
+	CRegister* m_dh;
+	CRegister* m_bh;
 
 	// ========================================================================
 	// >> 16-bit General purpose registers
 	// ========================================================================
-	void* m_ax;
-	void* m_cx;
-	void* m_dx;
-	void* m_bx;
-	void* m_sp;
-	void* m_bp;
-	void* m_si;
-	void* m_di;
+	CRegister* m_ax;
+	CRegister* m_cx;
+	CRegister* m_dx;
+	CRegister* m_bx;
+	CRegister* m_sp;
+	CRegister* m_bp;
+	CRegister* m_si;
+	CRegister* m_di;
 
 	// 64-bit mode only
-	void* m_r8w;
-	void* m_r9w;
-	void* m_r10w;
-	void* m_r11w;
-	void* m_r12w;
-	void* m_r13w;
-	void* m_r14w;
-	void* m_r15w;
+	CRegister* m_r8w;
+	CRegister* m_r9w;
+	CRegister* m_r10w;
+	CRegister* m_r11w;
+	CRegister* m_r12w;
+	CRegister* m_r13w;
+	CRegister* m_r14w;
+	CRegister* m_r15w;
 
 	// ========================================================================
 	// >> 32-bit General purpose registers
 	// ========================================================================
-	void* m_eax;
-	void* m_ecx;
-	void* m_edx;
-	void* m_ebx;
-	void* m_esp;
-	void* m_ebp;
-	void* m_esi;
-	void* m_edi;
+	CRegister* m_eax;
+	CRegister* m_ecx;
+	CRegister* m_edx;
+	CRegister* m_ebx;
+	CRegister* m_esp;
+	CRegister* m_ebp;
+	CRegister* m_esi;
+	CRegister* m_edi;
 
 	// 64-bit mode only
-	void* m_r8d;
-	void* m_r9d;
-	void* m_r10d;
-	void* m_r11d;
-	void* m_r12d;
-	void* m_r13d;
-	void* m_r14d;
-	void* m_r15d;
+	CRegister* m_r8d;
+	CRegister* m_r9d;
+	CRegister* m_r10d;
+	CRegister* m_r11d;
+	CRegister* m_r12d;
+	CRegister* m_r13d;
+	CRegister* m_r14d;
+	CRegister* m_r15d;
 
 	// ========================================================================
 	// >> 64-bit General purpose registers
 	// ========================================================================
 	// 64-bit mode only
-	void* m_rax;
-	void* m_rcx;
-	void* m_rdx;
-	void* m_rbx;
-	void* m_rsp;
-	void* m_rbp;
-	void* m_rsi;
-	void* m_rdi;
+	CRegister* m_rax;
+	CRegister* m_rcx;
+	CRegister* m_rdx;
+	CRegister* m_rbx;
+	CRegister* m_rsp;
+	CRegister* m_rbp;
+	CRegister* m_rsi;
+	CRegister* m_rdi;
 	
 	// 64-bit mode only
-	void* m_r8;
-	void* m_r9;
-	void* m_r10;
-	void* m_r11;
-	void* m_r12;
-	void* m_r13;
-	void* m_r14;
-	void* m_r15;
+	CRegister* m_r8;
+	CRegister* m_r9;
+	CRegister* m_r10;
+	CRegister* m_r11;
+	CRegister* m_r12;
+	CRegister* m_r13;
+	CRegister* m_r14;
+	CRegister* m_r15;
 
 	// ========================================================================
 	// >> 64-bit MM (MMX) registers
 	// ========================================================================
-	void* m_mm0;
-	void* m_mm1;
-	void* m_mm2;
-	void* m_mm3;
-	void* m_mm4;
-	void* m_mm5;
-	void* m_mm6;
-	void* m_mm7;
+	CRegister* m_mm0;
+	CRegister* m_mm1;
+	CRegister* m_mm2;
+	CRegister* m_mm3;
+	CRegister* m_mm4;
+	CRegister* m_mm5;
+	CRegister* m_mm6;
+	CRegister* m_mm7;
 
 	// ========================================================================
 	// >> 128-bit XMM registers
 	// ========================================================================
-	void* m_xmm0;
-	void* m_xmm1;
-	void* m_xmm2;
-	void* m_xmm3;
-	void* m_xmm4;
-	void* m_xmm5;
-	void* m_xmm6;
-	void* m_xmm7;
+	CRegister* m_xmm0;
+	CRegister* m_xmm1;
+	CRegister* m_xmm2;
+	CRegister* m_xmm3;
+	CRegister* m_xmm4;
+	CRegister* m_xmm5;
+	CRegister* m_xmm6;
+	CRegister* m_xmm7;
 
 	// 64-bit mode only
-	void* m_xmm8;
-	void* m_xmm9;
-	void* m_xmm10;
-	void* m_xmm11;
-	void* m_xmm12;
-	void* m_xmm13;
-	void* m_xmm14;
-	void* m_xmm15;
+	CRegister* m_xmm8;
+	CRegister* m_xmm9;
+	CRegister* m_xmm10;
+	CRegister* m_xmm11;
+	CRegister* m_xmm12;
+	CRegister* m_xmm13;
+	CRegister* m_xmm14;
+	CRegister* m_xmm15;
 
 	// ========================================================================
 	// >> 16-bit Segment registers
 	// ========================================================================
-	void* m_cs;
-	void* m_ss;
-	void* m_ds;
-	void* m_es;
-	void* m_fs;
-	void* m_gs;
+	CRegister* m_cs;
+	CRegister* m_ss;
+	CRegister* m_ds;
+	CRegister* m_es;
+	CRegister* m_fs;
+	CRegister* m_gs;
 
 	// ========================================================================
 	// >> 80-bit FPU registers
 	// ========================================================================
-	void* m_st0;
-	void* m_st1;
-	void* m_st2;
-	void* m_st3;
-	void* m_st4;
-	void* m_st5;
-	void* m_st6;
-	void* m_st7;
+	CRegister* m_st0;
+	CRegister* m_st1;
+	CRegister* m_st2;
+	CRegister* m_st3;
+	CRegister* m_st4;
+	CRegister* m_st5;
+	CRegister* m_st6;
+	CRegister* m_st7;
 };
 
 

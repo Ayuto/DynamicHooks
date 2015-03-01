@@ -40,12 +40,12 @@ using namespace std;
 // ============================================================================
 // >> HELPER FUNCTIONS
 // ============================================================================
-#ifdef _WIN32
 void pause()
 {
+#ifdef _WIN32
 	system("pause");
-}
 #endif
+}
 
 // ============================================================================
 // >> cdecl test
@@ -59,9 +59,9 @@ int MyFunc(int x, int y)
 bool MyHook(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook " << eHookType << endl;
-	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 8) << endl;
-	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 4) << endl;
-	//pHook->m_pRegisters->SetValue<int>(pHook->m_pRegisters->m_eax, 1337);
+	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
+	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
 	return false;
 }
 
@@ -81,8 +81,9 @@ public:
 bool MyHook2(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook2" << endl;
-	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 8) << endl;
-	cout << pHook->m_pRegisters->GetValue<int>(pHook->m_pRegisters->m_esp, 4) << endl;
+	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
+	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
 	return false;
 }
 
@@ -102,6 +103,7 @@ int main()
 	/*
 		CDECL test
 	*/
+
 	cout << "CDECL test" << endl;
 
 	std::list<Register_t> registers;
@@ -113,10 +115,11 @@ int main()
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
 
 	cout << "End result: " << MyFunc(3, 10) << endl << endl;
-	
+
 	/*
 		THISCALL test
 	*/
+
 	cout << "THISCALL test" << endl;
 	int (__thiscall Entity::*func)(int, int) = &Entity::AddHealth;
 	void* pFunc = (void *&) func;

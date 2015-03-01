@@ -62,6 +62,10 @@ enum HookType_t
 class CHook;
 typedef bool (*HookHandlerFn)(HookType_t, CHook*);
 
+#ifdef __linux__
+#define __cdecl
+#endif
+
 
 // ============================================================================
 // >> CLASSES
