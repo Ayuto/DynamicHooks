@@ -158,6 +158,7 @@ void* CHook::CreateBridge()
 	a.bind(label_override);
 
 	// Finally, return to the caller
+	// This will still call post hooks, but will skip the original function.
 	a.ret(imm(m_iPopSize));
 
 	return a.make();
@@ -196,7 +197,6 @@ void* CHook::CreatePostCallback()
 	return a.make();
 }
 
-
 void CHook::Write_CallHandler(Assembler& a, HookType_t type)
 {	
 	bool (__cdecl CHook::*HookHandler)(HookType_t) = &CHook::HookHandler;
@@ -204,6 +204,7 @@ void CHook::Write_CallHandler(Assembler& a, HookType_t type)
 	// Save the registers so that we can access them in our handlers
 	Write_SaveRegisters(a);
 
+	// Call the global hook handler
 	a.push(type);
 	a.push(imm((sysint_t) this));
 	a.call((void *&) HookHandler);

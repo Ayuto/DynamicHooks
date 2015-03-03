@@ -103,36 +103,47 @@ int main()
 	/*
 		CDECL test
 	*/
-
 	cout << "CDECL test" << endl;
 
+	// Prepare registers
 	std::list<Register_t> registers;
 	registers.push_back(ESP);
 	registers.push_back(EAX);
 
+	// Hook function
 	pHook = pHookMngr->HookFunction((void *) &MyFunc, 0, registers);
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
 
+	// Call the function
 	cout << "End result: " << MyFunc(3, 10) << endl << endl;
 
 	/*
 		THISCALL test
 	*/
-
 	cout << "THISCALL test" << endl;
+
 	int (__thiscall Entity::*func)(int, int) = &Entity::AddHealth;
 	void* pFunc = (void *&) func;
-
+	
+	// Prepare registers
 	std::list<Register_t> regs;
 	regs.push_back(ESP);
 	regs.push_back(EAX);
 	regs.push_back(ECX);
 
-	pHook = pHookMngr->HookFunction(pFunc, 8, regs);
+#ifdef __linux__
+	int iPopSize = 0;
+#else
+	int iPopSize = 8;
+#endif
+	
+	// Hook function
+	pHook = pHookMngr->HookFunction(pFunc, iPopSize, regs);
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook2);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook2);
-
+	
+	// Call the function
 	Entity e;
 	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
 
