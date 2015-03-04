@@ -5,16 +5,16 @@
 * =============================================================================
 *
 * This software is provided 'as-is', without any express or implied warranty.
-* In no event will the authors be held liable for any damages arising from 
+* In no event will the authors be held liable for any damages arising from
 * the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose, 
-* including commercial applications, and to alter it and redistribute it 
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
 * freely, subject to the following restrictions:
 *
-* 1. The origin of this software must not be misrepresented; you must not 
-* claim that you wrote the original software. If you use this software in a 
-* product, an acknowledgment in the product documentation would be 
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software in a
+* product, an acknowledgment in the product documentation would be
 * appreciated but is not required.
 *
 * 2. Altered source versions must be plainly marked as such, and must not be
@@ -70,7 +70,7 @@ CHook::CHook(void* pFunc, int iPopSize, std::list<Register_t> vecRegistersToSave
 	// Copy the required bytes to our array
 	SetMemPatchable(pCopiedBytes, iBytesToCopy + JMP_SIZE);
 	copy_bytes(pTarget, pCopiedBytes, JMP_SIZE);
-	
+
 	// Write a jump after the copied bytes to the function/bridge + number of bytes to copy
 	WriteJMP(pCopiedBytes + iBytesToCopy, pTarget + iBytesToCopy);
 
@@ -145,7 +145,7 @@ void* CHook::CreateBridge()
 
 	// Write a redirect to the post-hook code
 	Write_ModifyReturnAddress(a);
-		
+
 	// Call the pre-hook handler and jump to label_override if true was returned
 	Write_CallHandler(a, HOOKTYPE_PRE);
 	a.cmp(nax, true);
@@ -178,7 +178,7 @@ void CHook::Write_ModifyReturnAddress(Assembler& a)
 }
 
 void* CHook::CreatePostCallback()
-{	
+{
 	Assembler a;
 
 	// Subtract the previously added bytes, so that we can access the arguments again
@@ -198,9 +198,9 @@ void* CHook::CreatePostCallback()
 }
 
 void CHook::Write_CallHandler(Assembler& a, HookType_t type)
-{	
+{
 	bool (__cdecl CHook::*HookHandler)(HookType_t) = &CHook::HookHandler;
-	
+
 	// Save the registers so that we can access them in our handlers
 	Write_SaveRegisters(a);
 
@@ -230,7 +230,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case CL: a.mov(byte_ptr_abs(m_pRegisters->m_cl->m_pAddress), cl); break;
 		case DL: a.mov(byte_ptr_abs(m_pRegisters->m_dl->m_pAddress), dl); break;
 		case BL: a.mov(byte_ptr_abs(m_pRegisters->m_bl->m_pAddress), bl); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case SPL: a.mov(byte_ptr_abs(m_pRegisters->m_spl->m_pAddress), spl); break;
@@ -246,12 +246,12 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case R14B: a.mov(byte_ptr_abs(m_pRegisters->m_r14b->m_pAddress), r14b); break;
 		case R15B: a.mov(byte_ptr_abs(m_pRegisters->m_r15b->m_pAddress), r15b); break;
 #endif // ASMJIT_X64
-	
+
 		case AH: a.mov(byte_ptr_abs(m_pRegisters->m_ah->m_pAddress), ah); break;
 		case CH: a.mov(byte_ptr_abs(m_pRegisters->m_ch->m_pAddress), ch); break;
 		case DH: a.mov(byte_ptr_abs(m_pRegisters->m_dh->m_pAddress), dh); break;
 		case BH: a.mov(byte_ptr_abs(m_pRegisters->m_bh->m_pAddress), bh); break;
-	
+
 		// ========================================================================
 		// >> 16-bit General purpose registers
 		// ========================================================================
@@ -263,7 +263,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case BP: a.mov(word_ptr_abs(m_pRegisters->m_bp->m_pAddress), bp); break;
 		case SI: a.mov(word_ptr_abs(m_pRegisters->m_si->m_pAddress), si); break;
 		case DI: a.mov(word_ptr_abs(m_pRegisters->m_di->m_pAddress), di); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8W: a.mov(word_ptr_abs(m_pRegisters->m_r8w->m_pAddress), r8w); break;
@@ -275,7 +275,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case R14W: a.mov(word_ptr_abs(m_pRegisters->m_r14w->m_pAddress), r14w); break;
 		case R15W: a.mov(word_ptr_abs(m_pRegisters->m_r15w->m_pAddress), r15w); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 32-bit General purpose registers
 		// ========================================================================
@@ -287,7 +287,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case EBP: a.mov(dword_ptr_abs(m_pRegisters->m_ebp->m_pAddress), ebp); break;
 		case ESI: a.mov(dword_ptr_abs(m_pRegisters->m_esi->m_pAddress), esi); break;
 		case EDI: a.mov(dword_ptr_abs(m_pRegisters->m_edi->m_pAddress), edi); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8D: a.mov(dword_ptr_abs(m_pRegisters->m_r8d->m_pAddress), r8d); break;
@@ -299,7 +299,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case R14D: a.mov(dword_ptr_abs(m_pRegisters->m_r14d->m_pAddress), r14d); break;
 		case R15D: a.mov(dword_ptr_abs(m_pRegisters->m_r15d->m_pAddress), r15d); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 64-bit General purpose registers
 		// ========================================================================
@@ -314,7 +314,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case RSI: a.mov(qword_ptr_abs(m_pRegisters->m_rsi->m_pAddress), rsi); break;
 		case RDI: a.mov(qword_ptr_abs(m_pRegisters->m_rdi->m_pAddress), rdi); break;
 #endif // ASMJIT_X64
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8: a.mov(qword_ptr_abs(m_pRegisters->m_r8->m_pAddress), r8); break;
@@ -326,7 +326,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case R14: a.mov(qword_ptr_abs(m_pRegisters->m_r14->m_pAddress), r14); break;
 		case R15: a.mov(qword_ptr_abs(m_pRegisters->m_r15->m_pAddress), r15); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 64-bit MM (MMX) registers
 		// ========================================================================
@@ -338,7 +338,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case MM5: a.movq(qword_ptr_abs(m_pRegisters->m_mm5->m_pAddress), mm5); break;
 		case MM6: a.movq(qword_ptr_abs(m_pRegisters->m_mm6->m_pAddress), mm6); break;
 		case MM7: a.movq(qword_ptr_abs(m_pRegisters->m_mm7->m_pAddress), mm7); break;
-	
+
 		// ========================================================================
 		// >> 128-bit XMM registers
 		// ========================================================================
@@ -351,7 +351,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case XMM5: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm5->m_pAddress), xmm5); break;
 		case XMM6: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm6->m_pAddress), xmm6); break;
 		case XMM7: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm7->m_pAddress), xmm7); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case XMM8: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm8->m_pAddress), xmm8); break;
@@ -363,7 +363,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case XMM14: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm14->m_pAddress), xmm14); break;
 		case XMM15: a.movaps(dqword_ptr_abs(m_pRegisters->m_xmm15->m_pAddress), xmm15); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 16-bit Segment registers
 		// ========================================================================
@@ -373,7 +373,7 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		case ES: a.mov(word_ptr_abs(m_pRegisters->m_es->m_pAddress), es); break;
 		case FS: a.mov(word_ptr_abs(m_pRegisters->m_fs->m_pAddress), fs); break;
 		case GS: a.mov(word_ptr_abs(m_pRegisters->m_gs->m_pAddress), gs); break;
-	
+
 		// ========================================================================
 		// >> 80-bit FPU registers
 		// ========================================================================
@@ -404,7 +404,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case CL: a.mov(cl, byte_ptr_abs(m_pRegisters->m_cl->m_pAddress)); break;
 		case DL: a.mov(dl, byte_ptr_abs(m_pRegisters->m_dl->m_pAddress)); break;
 		case BL: a.mov(bl, byte_ptr_abs(m_pRegisters->m_bl->m_pAddress)); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case SPL: a.mov(spl, byte_ptr_abs(m_pRegisters->m_spl->m_pAddress)); break;
@@ -425,7 +425,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case CH: a.mov(ch, byte_ptr_abs(m_pRegisters->m_ch->m_pAddress)); break;
 		case DH: a.mov(dh, byte_ptr_abs(m_pRegisters->m_dh->m_pAddress)); break;
 		case BH: a.mov(bh, byte_ptr_abs(m_pRegisters->m_bh->m_pAddress)); break;
-	
+
 		// ========================================================================
 		// >> 16-bit General purpose registers
 		// ========================================================================
@@ -437,7 +437,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case BP: a.mov(bp, word_ptr_abs(m_pRegisters->m_bp->m_pAddress)); break;
 		case SI: a.mov(si, word_ptr_abs(m_pRegisters->m_si->m_pAddress)); break;
 		case DI: a.mov(di, word_ptr_abs(m_pRegisters->m_di->m_pAddress)); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8W: a.mov(r8w, word_ptr_abs(m_pRegisters->m_r8w->m_pAddress)); break;
@@ -449,7 +449,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case R14W: a.mov(r14w, word_ptr_abs(m_pRegisters->m_r14w->m_pAddress)); break;
 		case R15W: a.mov(r15w, word_ptr_abs(m_pRegisters->m_r15w->m_pAddress)); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 32-bit General purpose registers
 		// ========================================================================
@@ -461,7 +461,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case EBP: a.mov(ebp, dword_ptr_abs(m_pRegisters->m_ebp->m_pAddress)); break;
 		case ESI: a.mov(esi, dword_ptr_abs(m_pRegisters->m_esi->m_pAddress)); break;
 		case EDI: a.mov(edi, dword_ptr_abs(m_pRegisters->m_edi->m_pAddress)); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8D: a.mov(r8d, dword_ptr_abs(m_pRegisters->m_r8d->m_pAddress)); break;
@@ -473,7 +473,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case R14D: a.mov(r14d, dword_ptr_abs(m_pRegisters->m_r14d->m_pAddress)); break;
 		case R15D: a.mov(r15d, dword_ptr_abs(m_pRegisters->m_r15d->m_pAddress)); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 64-bit General purpose registers
 		// ========================================================================
@@ -488,7 +488,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case RSI: a.mov(rsi, qword_ptr_abs(m_pRegisters->m_rsi->m_pAddress)); break;
 		case RDI: a.mov(rdi, qword_ptr_abs(m_pRegisters->m_rdi->m_pAddress)); break;
 #endif // ASMJIT_X64
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case R8: a.mov(r8, qword_ptr_abs(m_pRegisters->m_r8->m_pAddress)); break;
@@ -500,7 +500,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case R14: a.mov(r14, qword_ptr_abs(m_pRegisters->m_r14->m_pAddress)); break;
 		case R15: a.mov(r15, qword_ptr_abs(m_pRegisters->m_r15->m_pAddress)); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 64-bit MM (MMX) registers
 		// ========================================================================
@@ -512,7 +512,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case MM5: a.movq(mm5, mmword_ptr_abs(m_pRegisters->m_mm5->m_pAddress)); break;
 		case MM6: a.movq(mm6, mmword_ptr_abs(m_pRegisters->m_mm6->m_pAddress)); break;
 		case MM7: a.movq(mm7, mmword_ptr_abs(m_pRegisters->m_mm7->m_pAddress)); break;
-	
+
 		// ========================================================================
 		// >> 128-bit XMM registers
 		// ========================================================================
@@ -525,7 +525,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case XMM5: a.movaps(xmm5, dqword_ptr_abs(m_pRegisters->m_xmm5->m_pAddress)); break;
 		case XMM6: a.movaps(xmm6, dqword_ptr_abs(m_pRegisters->m_xmm6->m_pAddress)); break;
 		case XMM7: a.movaps(xmm7, dqword_ptr_abs(m_pRegisters->m_xmm7->m_pAddress)); break;
-	
+
 #if defined(ASMJIT_X64)
 		// 64-bit mode only
 		case XMM8: a.movaps(xmm8, dqword_ptr_abs(m_pRegisters->m_xmm8->m_pAddress)); break;
@@ -537,7 +537,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case XMM14: a.movaps(xmm14, dqword_ptr_abs(m_pRegisters->m_xmm14->m_pAddress)); break;
 		case XMM15: a.movaps(xmm15, dqword_ptr_abs(m_pRegisters->m_xmm15->m_pAddress)); break;
 #endif // ASMJIT_X64
-	
+
 		// ========================================================================
 		// >> 16-bit Segment registers
 		// ========================================================================
@@ -547,7 +547,7 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		case ES: a.mov(es, word_ptr_abs(m_pRegisters->m_es->m_pAddress)); break;
 		case FS: a.mov(fs, word_ptr_abs(m_pRegisters->m_fs->m_pAddress)); break;
 		case GS: a.mov(gs, word_ptr_abs(m_pRegisters->m_gs->m_pAddress)); break;
-	
+
 		// ========================================================================
 		// >> 80-bit FPU registers
 		// ========================================================================

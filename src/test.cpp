@@ -59,10 +59,14 @@ int MyFunc(int x, int y)
 bool MyHook(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook " << eHookType << endl;
-	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
-	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "12: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(12) << endl;
+	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
+	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << " 0: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(0) << endl;
 	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	return false;
+	pHook->m_pRegisters->m_eax->SetValue<int>(1337);
+	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
+	return true;
 }
 
 // ============================================================================
@@ -81,10 +85,14 @@ public:
 bool MyHook2(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook2" << endl;
-	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
-	cout << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "12: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(12) << endl;
+	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
+	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << " 0: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(0) << endl;
 	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	return false;
+	pHook->m_pRegisters->m_eax->SetValue<int>(1337);
+	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
+	return true;
 }
 
 
@@ -146,6 +154,7 @@ int main()
 	// Call the function
 	Entity e;
 	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
+	cout << "this pointer: " << (int) &e << endl;
 
 	/*
 		Clean Up
