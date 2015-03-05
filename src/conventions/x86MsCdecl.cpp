@@ -76,7 +76,7 @@ void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
 {
 	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
-		return pRegisters->m_st0;
+		return pRegisters->m_st0->m_pAddress;
 
-	return pRegisters->m_eax;
+	return pRegisters->m_eax->m_pAddress;
 }

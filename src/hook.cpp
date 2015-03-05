@@ -148,7 +148,11 @@ void* CHook::CreateBridge()
 
 	// Call the pre-hook handler and jump to label_override if true was returned
 	Write_CallHandler(a, HOOKTYPE_PRE);
-	a.cmp(nax, true);
+	a.cmp(eax, true);
+	
+	// Restore the previously saved registers, so any changes will be applied
+	Write_RestoreRegisters(a);
+
 	a.je(label_override);
 
 	// Jump to the trampoline
@@ -189,6 +193,9 @@ void* CHook::CreatePostCallback()
 	// Call the post-hook handler
 	Write_CallHandler(a, HOOKTYPE_POST);
 
+	// Restore the previously saved registers, so any changes will be applied
+	Write_RestoreRegisters(a);
+
 	// Add them again to the stack
 	a.add(esp, imm(iPopSize+4));
 
@@ -211,12 +218,6 @@ void CHook::Write_CallHandler(Assembler& a, HookType_t type)
 	a.push(imm((sysint_t) this));
 	a.call((void *&) HookHandler);
 	a.add(esp, 8);
-
-	// Move the return value to the nax register (AsmJit extension)
-	a.mov(nax, eax);
-
-	// Restore them, so any changes will be applied
-	Write_RestoreRegisters(a);
 }
 
 void CHook::Write_SaveRegisters(Assembler& a)
