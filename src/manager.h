@@ -36,6 +36,7 @@
 // ============================================================================
 #include <list>
 #include "hook.h"
+#include "convention.h"
 
 
 // ============================================================================
@@ -49,7 +50,7 @@ public:
 	function was already hooked, the existing CHook instance will be
 	returned.
 	*/
-    CHook* HookFunction(void* pFunc, int iPopSize, std::list<Register_t> vecRegistersToSave);
+    CHook* HookFunction(void* pFunc, ICallingConvention* pConvention);
 	
 	/*
 	Removes all callbacks and restores the original function.

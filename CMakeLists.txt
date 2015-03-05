@@ -1,7 +1,12 @@
 CMake_Minimum_Required(VERSION 2.8)
 Project(DynamicHooks)
 
+Set(CONVENTION_HEADERS
+    src/conventions/x86MsCdecl.h
+)
+
 Set(HEADER_FILES
+    ${CONVENTION_HEADERS}
     src/asm.h
     src/convention.h
     src/hook.h
@@ -10,9 +15,13 @@ Set(HEADER_FILES
     src/utilities.h
 )
 
+Set(CONVENTION_SOURCES
+    src/conventions/x86MsCdecl.cpp
+)
+
 Set(SOURCE_FILES
+    ${CONVENTION_SOURCES}
     src/asm.cpp
-    src/convention.cpp
     src/hook.cpp
     src/manager.cpp
     src/registers.cpp
@@ -23,6 +32,9 @@ Set(DYNAMICHOOKS_FILES
     ${HEADER_FILES}
     ${SOURCE_FILES}
 )
+
+Source_Group("Header Files\\Conventions"    FILES ${CONVENTION_HEADERS})
+Source_Group("Source Files\\Conventions"    FILES ${CONVENTION_SOURCES})
 
 Include_Directories(src/thirdparty/AsmJit/include)
 
@@ -43,8 +55,8 @@ Endif()
 
 If(WIN32)
     Target_Link_Libraries(DynamicHooks
-        debug ../src/thirdparty/AsmJit/lib/AsmJit_d
-        optimized ../src/thirdparty/AsmJit/lib/AsmJit
+        debug ../../src/thirdparty/AsmJit/lib/AsmJit_d
+        optimized ../../src/thirdparty/AsmJit/lib/AsmJit
     )
 Else()
     If(CMAKE_BUILD_TYPE MATCHES Debug)

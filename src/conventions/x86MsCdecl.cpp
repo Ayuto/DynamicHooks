@@ -31,67 +31,52 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "manager.h"
+#include "x86MsCdecl.h"
 
 
 // ============================================================================
-// >> CHookManager
+// >> x86MsCdecl
 // ============================================================================
-CHook* CHookManager::HookFunction(void* pFunc, ICallingConvention* pConvention)
+x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
+	ICallingConvention(vecArgTypes, returnType, iAlignment)
 {
-	if (!pFunc)
-		return NULL;
+}
 
-	CHook* pHook = FindHook(pFunc);
-	if (pHook)
+std::list<Register_t> x86MsCdecl::GetRegisters()
+{
+	std::list<Register_t> registers;
+
+	registers.push_back(ESP);
+
+	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
+		registers.push_back(ST0);
+	else
+		registers.push_back(EAX);
+
+	return registers;
+}
+
+int x86MsCdecl::GetPopSize()
+{
+	return 0;
+}
+
+void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
+{
+	int iOffset = 4;
+	for(int i=0; i < iIndex; i++)
 	{
-		delete pConvention;
-		return pHook;
+		DataType_t type = m_vecArgTypes[i];
+		iOffset += GetDataTypeSize(type, m_iAlignment);
 	}
-	
-	pHook = new CHook(pFunc, pConvention);
-	m_Hooks.push_back(pHook);
-	return pHook;
+
+	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
 }
 
-void CHookManager::UnhookFunction(void* pFunc)
+void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
 {
-	CHook* pHook = FindHook(pFunc);
-	if (pHook)
-	{
-		m_Hooks.remove(pHook);
-		delete pHook;
-	}
-}
+	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
+		return pRegisters->m_st0;
 
-CHook* CHookManager::FindHook(void* pFunc)
-{
-	if (!pFunc)
-		return NULL;
-
-	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
-	{
-		CHook* pHook = *it;
-		if (pHook->m_pFunc == pFunc)
-			return pHook;
-	}
-	return NULL;
-}
-
-void CHookManager::UnhookAllFunctions()
-{
-	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
-		delete *it;
-
-	m_Hooks.clear();
-}
-
-
-// ============================================================================
-// >> GetHookManager
-// ============================================================================
-CHookManager* GetHookManager()
-{
-	static CHookManager* s_pManager = new CHookManager;
-	return s_pManager;
+	return pRegisters->m_eax;
 }

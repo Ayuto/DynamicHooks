@@ -38,6 +38,7 @@
 #include <map>
 
 #include "registers.h"
+#include "convention.h"
 
 #include "asmjit.h"
 using namespace AsmJit;
@@ -78,11 +79,13 @@ private:
 	/*
 	Creates a new function hook.
 
-	@param pFunc The address of the function to hook
-	@param iPopSize The number of bytes the original function pops off the stack.
-	@param vecRegistersToSave A list that defines which registers should be saved.
+	@param <pFunc>:
+	The address of the function to hook
+
+	@param <pConvention>:
+	The calling convention of <pFunc>.
 	*/
-	CHook(void* pFunc, int iPopSize, std::list<Register_t> vecRegistersToSave);
+	CHook(void* pFunc, ICallingConvention* pConvention);
 	~CHook();
 
 public:
@@ -110,6 +113,30 @@ public:
 	*/
 	bool IsCallbackRegistered(HookType_t type, HookHandlerFn* pFunc);
 
+	template<class T>
+	T GetArgument(int iIndex)
+	{
+		return *(T *) m_pCallingConvention->GetArgumentPtr(iIndex, m_pRegisters);
+	}
+
+	template<class T>
+	void SetArgument(int iIndex, T value)
+	{
+		*(T *) m_pCallingConvention->GetArgumentPtr(iIndex, m_pRegisters) = value;
+	}
+
+	template<class T>
+	T GetReturnValue()
+	{
+		return *(T *)  m_pCallingConvention->GetReturnPtr(m_pRegisters);
+	}
+
+	template<class T>
+	void SetReturnValue(T value)
+	{
+		*(T *)  m_pCallingConvention->GetReturnPtr(m_pRegisters) = value;
+	}
+
 private:
 	void* CreateBridge();
 
@@ -128,11 +155,7 @@ public:
 	// Address of the original function
 	void* m_pFunc;
 
-	// Number of bytes to pop off
-	int m_iPopSize;
-
-	// Registers to save
-	std::list<Register_t> m_vecRegistersToSave;
+	ICallingConvention* m_pCallingConvention;
 
 	// Address of the bridge
 	void* m_pBridge;

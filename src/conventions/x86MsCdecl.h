@@ -28,70 +28,30 @@
 * Idea and trampoline code taken from DynDetours (thanks your-name-here).
 */
 
+#ifndef _X86_MS_CDECL_H
+#define _X86_MS_CDECL_H
+
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "manager.h"
+#include "../convention.h"
 
 
 // ============================================================================
-// >> CHookManager
+// >> CLASSES
 // ============================================================================
-CHook* CHookManager::HookFunction(void* pFunc, ICallingConvention* pConvention)
-{
-	if (!pFunc)
-		return NULL;
+/*
+*/
+class x86MsCdecl: public ICallingConvention
+{	
+public:
+	x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment=4);
 
-	CHook* pHook = FindHook(pFunc);
-	if (pHook)
-	{
-		delete pConvention;
-		return pHook;
-	}
+	virtual std::list<Register_t> GetRegisters();
+	virtual int GetPopSize();
 	
-	pHook = new CHook(pFunc, pConvention);
-	m_Hooks.push_back(pHook);
-	return pHook;
-}
+	virtual void* GetArgumentPtr(int iIndex, CRegisters* pRegisters);
+	virtual void* GetReturnPtr(CRegisters* pRegisters);
+};
 
-void CHookManager::UnhookFunction(void* pFunc)
-{
-	CHook* pHook = FindHook(pFunc);
-	if (pHook)
-	{
-		m_Hooks.remove(pHook);
-		delete pHook;
-	}
-}
-
-CHook* CHookManager::FindHook(void* pFunc)
-{
-	if (!pFunc)
-		return NULL;
-
-	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
-	{
-		CHook* pHook = *it;
-		if (pHook->m_pFunc == pFunc)
-			return pHook;
-	}
-	return NULL;
-}
-
-void CHookManager::UnhookAllFunctions()
-{
-	for(std::list<CHook *>::iterator it=m_Hooks.begin(); it != m_Hooks.end(); it++)
-		delete *it;
-
-	m_Hooks.clear();
-}
-
-
-// ============================================================================
-// >> GetHookManager
-// ============================================================================
-CHookManager* GetHookManager()
-{
-	static CHookManager* s_pManager = new CHookManager;
-	return s_pManager;
-}
+#endif // _X86_MS_CDECL_H

@@ -48,12 +48,11 @@ using namespace AsmJit;
 // ============================================================================
 // >> CHook
 // ============================================================================
-CHook::CHook(void* pFunc, int iPopSize, std::list<Register_t> vecRegistersToSave)
+CHook::CHook(void* pFunc, ICallingConvention* pConvention)
 {
 	m_pFunc = pFunc;
-	m_iPopSize = iPopSize;
-	m_vecRegistersToSave = vecRegistersToSave;
 	m_pRegisters = new CRegisters();
+	m_pCallingConvention = pConvention;
 
 	unsigned char* pTarget = (unsigned char *) pFunc;
 
@@ -97,6 +96,7 @@ CHook::~CHook()
 	MemoryManager::getGlobal()->free(m_pNewRetAddr);
 
 	delete m_pRegisters;
+	delete m_pCallingConvention;
 }
 
 void CHook::AddCallback(HookType_t eHookType, HookHandlerFn* pCallback)
@@ -159,7 +159,7 @@ void* CHook::CreateBridge()
 
 	// Finally, return to the caller
 	// This will still call post hooks, but will skip the original function.
-	a.ret(imm(m_iPopSize));
+	a.ret(imm(m_pCallingConvention->GetPopSize()));
 
 	return a.make();
 }
@@ -181,14 +181,16 @@ void* CHook::CreatePostCallback()
 {
 	Assembler a;
 
+	int iPopSize = m_pCallingConvention->GetPopSize();
+
 	// Subtract the previously added bytes, so that we can access the arguments again
-	a.sub(esp, imm(m_iPopSize+4));
+	a.sub(esp, imm(iPopSize+4));
 
 	// Call the post-hook handler
 	Write_CallHandler(a, HOOKTYPE_POST);
 
 	// Add them again to the stack
-	a.add(esp, imm(m_iPopSize+4));
+	a.add(esp, imm(iPopSize+4));
 
 	// Jump to the original return address
 	a.jmp(dword_ptr_abs(&m_pRetAddr));
@@ -219,7 +221,8 @@ void CHook::Write_CallHandler(Assembler& a, HookType_t type)
 
 void CHook::Write_SaveRegisters(Assembler& a)
 {
-	for(std::list<Register_t>::iterator it=m_vecRegistersToSave.begin(); it != m_vecRegistersToSave.end(); it++)
+	std::list<Register_t> vecRegistersToSave = m_pCallingConvention->GetRegisters();
+	for(std::list<Register_t>::iterator it=vecRegistersToSave.begin(); it != vecRegistersToSave.end(); it++)
 	{
 		switch(*it)
 		{
@@ -393,7 +396,8 @@ void CHook::Write_SaveRegisters(Assembler& a)
 
 void CHook::Write_RestoreRegisters(Assembler& a)
 {
-	for(std::list<Register_t>::iterator it=m_vecRegistersToSave.begin(); it != m_vecRegistersToSave.end(); it++)
+	std::list<Register_t> vecRegistersToSave = m_pCallingConvention->GetRegisters();
+	for(std::list<Register_t>::iterator it=vecRegistersToSave.begin(); it != vecRegistersToSave.end(); it++)
 	{
 		switch(*it)
 		{

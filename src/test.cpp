@@ -35,6 +35,7 @@
 using namespace std;
 
 #include "manager.h"
+#include "conventions/x86MsCdecl.h"
 
 
 // ============================================================================
@@ -59,14 +60,14 @@ int MyFunc(int x, int y)
 bool MyHook(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook " << eHookType << endl;
-	cout << "12: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(12) << endl;
 	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
 	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
-	cout << " 0: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(0) << endl;
 	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	pHook->m_pRegisters->m_eax->SetValue<int>(1337);
-	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	return true;
+	
+	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
+	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
+	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;;
+	return false;
 }
 
 // ============================================================================
@@ -88,11 +89,8 @@ bool MyHook2(HookType_t eHookType, CHook* pHook)
 	cout << "12: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(12) << endl;
 	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
 	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
-	cout << " 0: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(0) << endl;
 	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	pHook->m_pRegisters->m_eax->SetValue<int>(1337);
-	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	return true;
+	return false;
 }
 
 
@@ -118,8 +116,12 @@ int main()
 	registers.push_back(ESP);
 	registers.push_back(EAX);
 
+	std::vector<DataType_t> vecArgType;
+	vecArgType.push_back(DATA_TYPE_INT);
+	vecArgType.push_back(DATA_TYPE_INT);
+
 	// Hook function
-	pHook = pHookMngr->HookFunction((void *) &MyFunc, 0, registers);
+	pHook = pHookMngr->HookFunction((void *) &MyFunc, new x86MsCdecl(vecArgType, DATA_TYPE_INT));
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
 
@@ -146,6 +148,7 @@ int main()
 	int iPopSize = 8;
 #endif
 	
+	/*
 	// Hook function
 	pHook = pHookMngr->HookFunction(pFunc, iPopSize, regs);
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook2);
@@ -155,6 +158,7 @@ int main()
 	Entity e;
 	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
 	cout << "this pointer: " << (int) &e << endl;
+	*/
 
 	/*
 		Clean Up
