@@ -4,9 +4,9 @@ Project(DynamicHooks)
 Set(CONVENTION_HEADERS
     src/conventions/x86MsCdecl.h
     src/conventions/x86GccCdecl.h
-	
-	src/conventions/x86MsThiscall.h
-	src/conventions/x86GccThiscall.h
+
+    src/conventions/x86MsThiscall.h
+    src/conventions/x86GccThiscall.h
 )
 
 Set(HEADER_FILES
@@ -22,7 +22,7 @@ Set(HEADER_FILES
 Set(CONVENTION_SOURCES
     src/conventions/x86MsCdecl.cpp
 
-	src/conventions/x86MsThiscall.cpp
+    src/conventions/x86MsThiscall.cpp
 )
 
 Set(SOURCE_FILES
@@ -47,11 +47,11 @@ Include_Directories(src/thirdparty/AsmJit/include)
 # Build static library?
 If(BUILD_TYPE MATCHES static)
     Add_Library(DynamicHooks STATIC ${DYNAMICHOOKS_FILES})
-    
+
 # Build shared library?
 Elseif(BUILD_TYPE MATCHES shared)
     Add_Library(DynamicHooks SHARED ${DYNAMICHOOKS_FILES})
-    
+
 # Build test/executable?
 Elseif(BUILD_TYPE MATCHES test)
     # Add test.cpp
