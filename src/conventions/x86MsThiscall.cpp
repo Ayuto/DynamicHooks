@@ -31,22 +31,23 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "x86MsCdecl.h"
+#include "x86MsThiscall.h"
 
 
 // ============================================================================
 // >> x86MsCdecl
 // ============================================================================
-x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
+x86MsThiscall::x86MsThiscall(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
 	ICallingConvention(vecArgTypes, returnType, iAlignment)
 {
 }
 
-std::list<Register_t> x86MsCdecl::GetRegisters()
+std::list<Register_t> x86MsThiscall::GetRegisters()
 {
 	std::list<Register_t> registers;
-
+	
 	registers.push_back(ESP);
+	registers.push_back(ECX);
 
 	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
 	{
@@ -64,23 +65,35 @@ std::list<Register_t> x86MsCdecl::GetRegisters()
 	return registers;
 }
 
-int x86MsCdecl::GetPopSize()
+int x86MsThiscall::GetPopSize()
 {
-	return 0;
+	int iPopSize = 0;
+
+	for(unsigned int i=1; i <= m_vecArgTypes.size() - 1; i++)
+	{
+		iPopSize += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
+	}
+
+	return iPopSize;
 }
 
-void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
+void* x86MsThiscall::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 {
-	int iOffset = 4;
-	for(int i=0; i < iIndex; i++)
+	if (iIndex == 0)
 	{
-		iOffset += GetDataTypeSize( m_vecArgTypes[i], m_iAlignment);
+		return pRegisters->m_ecx->m_pAddress;
+	}
+
+	int iOffset = 4;
+	for(int i=1; i < iIndex; i++)
+	{
+		iOffset += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
 	}
 
 	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
 }
 
-void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
+void* x86MsThiscall::GetReturnPtr(CRegisters* pRegisters)
 {
 	// TODO: Handle integers > 4 bytes
 	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)

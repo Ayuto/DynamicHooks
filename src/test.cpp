@@ -36,6 +36,7 @@ using namespace std;
 
 #include "manager.h"
 #include "conventions/x86MsCdecl.h"
+#include "conventions/x86MsThiscall.h"
 
 
 // ============================================================================
@@ -66,7 +67,9 @@ bool MyHook(HookType_t eHookType, CHook* pHook)
 	
 	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
 	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
-	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;;
+	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
+	
+	pHook->SetReturnValue<int>(1337);
 	return false;
 }
 
@@ -85,11 +88,18 @@ public:
 
 bool MyHook2(HookType_t eHookType, CHook* pHook)
 {
-	cout << "MyHook2" << endl;
-	cout << "12: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(12) << endl;
-	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
-	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "MyHook2 " << eHookType << endl;
+	cout << "   8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
+	cout << "   4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
+	cout << "this: " << pHook->m_pRegisters->m_ecx->GetValue<unsigned long>() << endl;
 	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
+	
+	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
+	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
+	cout << "Arg 2: " << pHook->GetArgument<int>(2) << endl;
+	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
+	
+	pHook->SetReturnValue<int>(1337);
 	return false;
 }
 
@@ -111,17 +121,13 @@ int main()
 	*/
 	cout << "CDECL test" << endl;
 
-	// Prepare registers
-	std::list<Register_t> registers;
-	registers.push_back(ESP);
-	registers.push_back(EAX);
-
-	std::vector<DataType_t> vecArgType;
-	vecArgType.push_back(DATA_TYPE_INT);
-	vecArgType.push_back(DATA_TYPE_INT);
+	// Prepare calling convention
+	std::vector<DataType_t> vecArgTypes;
+	vecArgTypes.push_back(DATA_TYPE_INT);
+	vecArgTypes.push_back(DATA_TYPE_INT);
 
 	// Hook function
-	pHook = pHookMngr->HookFunction((void *) &MyFunc, new x86MsCdecl(vecArgType, DATA_TYPE_INT));
+	pHook = pHookMngr->HookFunction((void *) &MyFunc, new x86MsCdecl(vecArgTypes, DATA_TYPE_INT));
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
 
@@ -136,21 +142,14 @@ int main()
 	int (__thiscall Entity::*func)(int, int) = &Entity::AddHealth;
 	void* pFunc = (void *&) func;
 	
-	// Prepare registers
-	std::list<Register_t> regs;
-	regs.push_back(ESP);
-	regs.push_back(EAX);
-	regs.push_back(ECX);
+	// Prepare calling convention
+	std::vector<DataType_t> vecArgTypes2;
+	vecArgTypes2.push_back(DATA_TYPE_POINTER);
+	vecArgTypes2.push_back(DATA_TYPE_INT);
+	vecArgTypes2.push_back(DATA_TYPE_INT);
 
-#ifdef __linux__
-	int iPopSize = 0;
-#else
-	int iPopSize = 8;
-#endif
-	
-	/*
 	// Hook function
-	pHook = pHookMngr->HookFunction(pFunc, iPopSize, regs);
+	pHook = pHookMngr->HookFunction(pFunc, new x86MsThiscall(vecArgTypes2, DATA_TYPE_INT));
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook2);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook2);
 	
@@ -158,7 +157,7 @@ int main()
 	Entity e;
 	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
 	cout << "this pointer: " << (int) &e << endl;
-	*/
+
 
 	/*
 		Clean Up

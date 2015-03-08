@@ -28,63 +28,19 @@
 * Idea and trampoline code taken from DynDetours (thanks your-name-here).
 */
 
+#ifndef _X86_GCC_THISCALL_H
+#define _X86_GCC_THISCALL_H
+
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "x86MsCdecl.h"
+#include "x86GccCdecl.h"
 
 
 // ============================================================================
-// >> x86MsCdecl
+// >> CLASSES
 // ============================================================================
-x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
-	ICallingConvention(vecArgTypes, returnType, iAlignment)
-{
-}
+typedef x86GccCdecl x86GccThiscall;
 
-std::list<Register_t> x86MsCdecl::GetRegisters()
-{
-	std::list<Register_t> registers;
 
-	registers.push_back(ESP);
-
-	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
-	{
-		registers.push_back(ST0);
-	}
-	else
-	{
-		registers.push_back(EAX);
-		if (GetDataTypeSize(m_returnType, m_iAlignment) > 4)
-		{
-			registers.push_back(EDX);
-		}
-	}
-
-	return registers;
-}
-
-int x86MsCdecl::GetPopSize()
-{
-	return 0;
-}
-
-void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
-{
-	int iOffset = 4;
-	for(int i=0; i < iIndex; i++)
-	{
-		iOffset += GetDataTypeSize( m_vecArgTypes[i], m_iAlignment);
-	}
-
-	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
-}
-
-void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
-{
-	// TODO: Handle integers > 4 bytes
-	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
-		return pRegisters->m_st0->m_pAddress;
-
-	return pRegisters->m_eax->m_pAddress;
-}
+#endif // _X86_GCC_THISCALL_H

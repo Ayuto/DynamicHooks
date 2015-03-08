@@ -28,63 +28,49 @@
 * Idea and trampoline code taken from DynDetours (thanks your-name-here).
 */
 
+#ifndef _X86_MS_THISCALL_H
+#define _X86_MS_THISCALL_H
+
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "x86MsCdecl.h"
+#include "../convention.h"
 
 
 // ============================================================================
-// >> x86MsCdecl
+// >> CLASSES
 // ============================================================================
-x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
-	ICallingConvention(vecArgTypes, returnType, iAlignment)
-{
-}
+/*
+Source: DynCall manual and Windows docs
 
-std::list<Register_t> x86MsCdecl::GetRegisters()
-{
-	std::list<Register_t> registers;
+Registers:
+	- eax = return value
+	- ecx = this pointer
+	- edx = return value
+	- esp = stack pointer
+	- st0 = floating point return value
 
-	registers.push_back(ESP);
+Parameter passing:
+	- stack parameter order: right-to-left
+	- callee cleans up the stack
+	- all other arguments are pushed onto the stack
+	- alignment: 4 bytes
 
-	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
-	{
-		registers.push_back(ST0);
-	}
-	else
-	{
-		registers.push_back(EAX);
-		if (GetDataTypeSize(m_returnType, m_iAlignment) > 4)
-		{
-			registers.push_back(EDX);
-		}
-	}
+Return values:
+	- return values of pointer or intergral type (<= 32 bits) are returned via the eax register
+	- integers > 32 bits are returned via the eax and edx registers
+	- floating pointer types are returned via the st0 register
+*/
+class x86MsThiscall: public ICallingConvention
+{	
+public:
+	x86MsThiscall(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment=4);
 
-	return registers;
-}
+	virtual std::list<Register_t> GetRegisters();
+	virtual int GetPopSize();
+	
+	virtual void* GetArgumentPtr(int iIndex, CRegisters* pRegisters);
+	virtual void* GetReturnPtr(CRegisters* pRegisters);
+};
 
-int x86MsCdecl::GetPopSize()
-{
-	return 0;
-}
-
-void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
-{
-	int iOffset = 4;
-	for(int i=0; i < iIndex; i++)
-	{
-		iOffset += GetDataTypeSize( m_vecArgTypes[i], m_iAlignment);
-	}
-
-	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
-}
-
-void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
-{
-	// TODO: Handle integers > 4 bytes
-	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
-		return pRegisters->m_st0->m_pAddress;
-
-	return pRegisters->m_eax->m_pAddress;
-}
+#endif // _X86_MS_THISCALL_H
