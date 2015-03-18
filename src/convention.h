@@ -167,12 +167,20 @@ public:
 	virtual void* GetArgumentPtr(int iIndex, CRegisters* pRegisters) = 0;
 
 	/*
+	*/
+	virtual void ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr) = 0;
+
+	/*
 	Returns a pointer to the return value.
 
 	@param <pRegisters>:
 	A snapshot of all saved registers.
 	*/
 	virtual void* GetReturnPtr(CRegisters* pRegisters) = 0;
+
+	/*
+	*/
+	virtual void ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr) = 0;
 
 public:
 	std::vector<DataType_t> m_vecArgTypes;

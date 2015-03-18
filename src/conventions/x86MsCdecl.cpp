@@ -40,6 +40,23 @@
 x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
 	ICallingConvention(vecArgTypes, returnType, iAlignment)
 {
+	int iSize = GetDataTypeSize(m_returnType);
+	if (iSize > 4)
+	{
+		m_pReturnBuffer = malloc(iSize);
+	}
+	else
+	{
+		m_pReturnBuffer = NULL;
+	}
+}
+
+x86MsCdecl::~x86MsCdecl()
+{
+	if (m_pReturnBuffer)
+	{
+		free(m_pReturnBuffer);
+	}
 }
 
 std::list<Register_t> x86MsCdecl::GetRegisters()
@@ -55,7 +72,7 @@ std::list<Register_t> x86MsCdecl::GetRegisters()
 	else
 	{
 		registers.push_back(EAX);
-		if (GetDataTypeSize(m_returnType, m_iAlignment) > 4)
+		if (m_pReturnBuffer)
 		{
 			registers.push_back(EDX);
 		}
@@ -80,11 +97,32 @@ void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
 }
 
+void x86MsCdecl::ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr)
+{
+}
+
 void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
 {
-	// TODO: Handle integers > 4 bytes
 	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
 		return pRegisters->m_st0->m_pAddress;
 
+	if (m_pReturnBuffer)
+	{
+		// First half in eax, second half in edx
+		memcpy(m_pReturnBuffer, pRegisters->m_eax, 4);
+		memcpy((void *) ((unsigned long) m_pReturnBuffer + 4), pRegisters->m_edx, 4);
+		return m_pReturnBuffer;
+	}
+
 	return pRegisters->m_eax->m_pAddress;
+}
+
+void x86MsCdecl::ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr)
+{
+	if (m_pReturnBuffer)
+	{
+		// First half in eax, second half in edx
+		memcpy(pRegisters->m_eax, m_pReturnBuffer, 4);
+		memcpy(pRegisters->m_edx, (void *) ((unsigned long) m_pReturnBuffer + 4), 4);
+	}
 }

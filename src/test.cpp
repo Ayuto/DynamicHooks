@@ -37,6 +37,8 @@ using namespace std;
 #include "manager.h"
 #include "conventions/x86MsCdecl.h"
 #include "conventions/x86MsThiscall.h"
+#include "conventions/x86GccCdecl.h"
+#include "conventions/x86GccThiscall.h"
 
 
 // ============================================================================
@@ -81,9 +83,15 @@ class Entity
 public:
 	int AddHealth(int x, int y)
 	{
-		cout << x << " Orignal func " << y << endl;
+		cout << x << " Orignal thiscall  func " << y << endl;
+
+		// Enable this line if the ecx register shouldn't be overwritten
+		z = this;
 		return x + y;
 	}
+
+public:
+	void* z;
 };
 
 bool MyHook2(HookType_t eHookType, CHook* pHook)
@@ -91,8 +99,7 @@ bool MyHook2(HookType_t eHookType, CHook* pHook)
 	cout << "MyHook2 " << eHookType << endl;
 	cout << "   8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
 	cout << "   4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
-	cout << "this: " << pHook->m_pRegisters->m_ecx->GetValue<unsigned long>() << endl;
-	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
+	//cout << "this: " << pHook->m_pRegisters->m_ecx->GetValue<int>() << endl;
 	
 	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
 	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
@@ -119,6 +126,7 @@ int main()
 	/*
 		CDECL test
 	*/
+    
 	cout << "CDECL test" << endl;
 
 	// Prepare calling convention
@@ -133,7 +141,7 @@ int main()
 
 	// Call the function
 	cout << "End result: " << MyFunc(3, 10) << endl << endl;
-
+    
 	/*
 		THISCALL test
 	*/

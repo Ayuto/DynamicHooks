@@ -64,12 +64,19 @@ class x86MsCdecl: public ICallingConvention
 {	
 public:
 	x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment=4);
+	~x86MsCdecl();
 
 	virtual std::list<Register_t> GetRegisters();
 	virtual int GetPopSize();
 	
 	virtual void* GetArgumentPtr(int iIndex, CRegisters* pRegisters);
+	virtual void ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr);
+
 	virtual void* GetReturnPtr(CRegisters* pRegisters);
+	virtual void ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr);
+
+private:
+	void* m_pReturnBuffer;
 };
 
 #endif // _X86_MS_CDECL_H

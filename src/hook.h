@@ -122,7 +122,9 @@ public:
 	template<class T>
 	void SetArgument(int iIndex, T value)
 	{
-		*(T *) m_pCallingConvention->GetArgumentPtr(iIndex, m_pRegisters) = value;
+		void* pPtr = m_pCallingConvention->GetArgumentPtr(iIndex, m_pRegisters);
+		*(T *) pPtr = value;
+		m_pCallingConvention->ArgumentPtrChanged(iIndex, m_pRegisters, pPtr);
 	}
 
 	template<class T>
@@ -134,7 +136,9 @@ public:
 	template<class T>
 	void SetReturnValue(T value)
 	{
-		*(T *)  m_pCallingConvention->GetReturnPtr(m_pRegisters) = value;
+		void* pPtr = m_pCallingConvention->GetReturnPtr(m_pRegisters);
+		*(T *)  pPtr = value;
+		m_pCallingConvention->ReturnPtrChanged(m_pRegisters, pPtr);
 	}
 
 private:
