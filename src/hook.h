@@ -153,6 +153,9 @@ private:
 
 	bool __cdecl HookHandler(HookType_t type);
 
+	void* __cdecl GetReturnAddress(void* pESP);
+	void __cdecl SetReturnAddress(void* pRetAddr, void* pESP);
+
 public:
 	std::map<HookType_t, std::list<HookHandlerFn*> > m_hookHandler;
 
@@ -170,11 +173,10 @@ public:
 	// Register storage
 	CRegisters* m_pRegisters;
 
-	// Contains the original return address
-	void* m_pRetAddr;
-
 	// New return address
 	void* m_pNewRetAddr;
+
+	std::map<void*, void*> m_RetAddr;
 };
 
 #endif // _HOOK_H

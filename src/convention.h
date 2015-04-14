@@ -98,6 +98,7 @@ inline int GetDataTypeSize(DataType_t type, int iAlignment=4)
 {
 	switch(type)
 	{
+		case DATA_TYPE_VOID:		return 0;
 		case DATA_TYPE_BOOL:		return Align(sizeof(bool),					iAlignment);
 		case DATA_TYPE_CHAR:		return Align(sizeof(char),					iAlignment);
 		case DATA_TYPE_UCHAR:		return Align(sizeof(unsigned char),			iAlignment);
@@ -113,7 +114,7 @@ inline int GetDataTypeSize(DataType_t type, int iAlignment=4)
 		case DATA_TYPE_DOUBLE:		return Align(sizeof(double),				iAlignment);
 		case DATA_TYPE_POINTER:		return Align(sizeof(void *),				iAlignment);
 		case DATA_TYPE_STRING:		return Align(sizeof(char *),				iAlignment);
-		default: puts("Uknown data type.");
+		default: puts("Unknown data type.");
 	}
 	return 0;
 }

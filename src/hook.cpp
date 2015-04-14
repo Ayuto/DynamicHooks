@@ -138,6 +138,21 @@ bool CHook::HookHandler(HookType_t eHookType)
 	return bOverride;
 }
 
+void* __cdecl CHook::GetReturnAddress(void* pESP)
+{
+	printf("Getting %u\n", pESP);
+	if (m_RetAddr.count(pESP) == 0)
+		puts("ESP not present.");
+
+	return m_RetAddr[pESP];
+}
+
+void __cdecl CHook::SetReturnAddress(void* pRetAddr, void* pESP)
+{
+	printf("Setting %u=%u\n", pESP, pRetAddr);
+	m_RetAddr[pESP] = pRetAddr;
+}
+
 void* CHook::CreateBridge()
 {
 	Assembler a;
@@ -170,11 +185,30 @@ void* CHook::CreateBridge()
 
 void CHook::Write_ModifyReturnAddress(Assembler& a)
 {
-	// Store the return address in nax (AsmJit extension)
-	a.mov(nax, dword_ptr(esp));
+	// Save scratch registers that are used by SetReturnAddress
+	void* pEAX2 = NULL;
+	void* pECX2 = NULL;
+	void* pEDX2 = NULL;
+	a.mov(dword_ptr_abs(&pEAX2), eax);
+	a.mov(dword_ptr_abs(&pECX2), ecx);
+	a.mov(dword_ptr_abs(&pEDX2), edx);
 
-	// Store return address in m_pRetAddr, so we can access it later
-	a.mov(dword_ptr_abs(&m_pRetAddr), nax);
+	// Store the return address in eax
+	a.mov(eax, dword_ptr(esp));
+	
+	// Save the original return address by using the current esp as the key.
+	// This should be unique until we have returned to the original caller.
+	void (__cdecl CHook::*SetReturnAddress)(void*, void*) = &CHook::SetReturnAddress;
+	a.push(esp);
+	a.push(eax);
+	a.push(imm((sysint_t) this));
+	a.call((void *&) SetReturnAddress);
+	a.add(esp, 12);
+	
+	// Restore scratch registers
+	a.mov(eax, dword_ptr_abs(&pEAX2));
+	a.mov(ecx, dword_ptr_abs(&pECX2));
+	a.mov(edx, dword_ptr_abs(&pEDX2));
 
 	// Override the return address. This is a redirect to our post-hook code
 	m_pNewRetAddr = CreatePostCallback();
@@ -187,7 +221,8 @@ void* CHook::CreatePostCallback()
 
 	int iPopSize = m_pCallingConvention->GetPopSize();
 
-	// Subtract the previously added bytes, so that we can access the arguments again
+	// Subtract the previously added bytes (stack size + return address), so
+	// that we can access the arguments again
 	a.sub(esp, imm(iPopSize+4));
 
 	// Call the post-hook handler
@@ -196,11 +231,36 @@ void* CHook::CreatePostCallback()
 	// Restore the previously saved registers, so any changes will be applied
 	Write_RestoreRegisters(a);
 
-	// Add them again to the stack
+	// Save scratch registers that are used by GetReturnAddress
+	void* pEAX2 = NULL;
+	void* pECX2 = NULL;
+	void* pEDX2 = NULL;
+	a.mov(dword_ptr_abs(&pEAX2), eax);
+	a.mov(dword_ptr_abs(&pECX2), ecx);
+	a.mov(dword_ptr_abs(&pEDX2), edx);
+	
+	// Get the original return address
+	void* (__cdecl CHook::*GetReturnAddress)(void*) = &CHook::GetReturnAddress;
+	a.push(esp);
+	a.push(imm((sysint_t) this));
+	a.call((void *&) GetReturnAddress);
+	a.add(esp, 8);
+
+	// Save the original return address
+	void* pRetAddr = NULL;
+	a.mov(dword_ptr_abs(&pRetAddr), eax);
+	
+	// Restore scratch registers
+	a.mov(eax, dword_ptr_abs(&pEAX2));
+	a.mov(ecx, dword_ptr_abs(&pECX2));
+	a.mov(edx, dword_ptr_abs(&pEDX2));
+
+	// Add the bytes again to the stack (stack size + return address), so we
+	// don't corrupt the stack.
 	a.add(esp, imm(iPopSize+4));
 
 	// Jump to the original return address
-	a.jmp(dword_ptr_abs(&m_pRetAddr));
+	a.jmp(dword_ptr_abs(&pRetAddr));
 
 	// Generate the code
 	return a.make();
