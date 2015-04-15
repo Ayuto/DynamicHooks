@@ -48,3 +48,4 @@ Include_Directories(../src/thirdparty/AsmJit/include)
 # =============================================================================
 create_dynamic_hooks_test(MS_CDECL1 ms_cdecl1.cpp)
 create_dynamic_hooks_test(MS_CDECL2 ms_cdecl2.cpp)
+create_dynamic_hooks_test(MS_THISCALL1 ms_thiscall1.cpp)

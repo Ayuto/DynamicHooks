@@ -140,7 +140,6 @@ bool CHook::HookHandler(HookType_t eHookType)
 
 void* __cdecl CHook::GetReturnAddress(void* pESP)
 {
-	printf("Getting %u\n", pESP);
 	if (m_RetAddr.count(pESP) == 0)
 		puts("ESP not present.");
 
@@ -149,7 +148,6 @@ void* __cdecl CHook::GetReturnAddress(void* pESP)
 
 void __cdecl CHook::SetReturnAddress(void* pRetAddr, void* pESP)
 {
-	printf("Setting %u=%u\n", pESP, pRetAddr);
 	m_RetAddr[pESP] = pRetAddr;
 }
 
