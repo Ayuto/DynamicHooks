@@ -43,9 +43,9 @@ Include_Directories(../src/thirdparty/AsmJit/include)
 # >> TESTS
 # =============================================================================
 If(WIN32)
-    create_dynamic_hooks_test(MS_CDECL1 ms_cdecl1.cpp)
-    create_dynamic_hooks_test(MS_CDECL2 ms_cdecl2.cpp)
-    create_dynamic_hooks_test(MS_THISCALL1 ms_thiscall1.cpp)
+    create_dynamic_hooks_test(test_ms_cdecl1 ms_cdecl1.cpp)
+    create_dynamic_hooks_test(test_ms_cdecl2 ms_cdecl2.cpp)
+    create_dynamic_hooks_test(test_ms_thiscall1 ms_thiscall1.cpp)
 Else()
-    create_dynamic_hooks_test(GCC_CDECL1 gcc_cdecl1.cpp)
+    create_dynamic_hooks_test(test_gcc_cdecl1 gcc_cdecl1.cpp)
 Endif()
