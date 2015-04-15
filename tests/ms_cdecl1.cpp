@@ -32,8 +32,6 @@
 // >> INCLUDES
 // ============================================================================
 #include "assert.h"
-#include <iostream>
-using namespace std;
 
 #include "manager.h"
 #include "conventions/x86MsCdecl.h"

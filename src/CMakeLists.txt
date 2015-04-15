@@ -1,6 +1,13 @@
+# =============================================================================
+# >> REQUIREMENTS & PROJECT
+# =============================================================================
 CMake_Minimum_Required(VERSION 2.8)
 Project(DynamicHooks)
 
+
+# =============================================================================
+# >> SOURCE & HEADER FILES
+# =============================================================================
 Set(CONVENTION_HEADERS
     conventions/x86MsCdecl.h
     conventions/x86GccCdecl.h
@@ -39,20 +46,32 @@ Set(DYNAMICHOOKS_FILES
 )
 
 
-# Create groups
+# =============================================================================
+# >> SOURCE GROUPS
+# =============================================================================
 Source_Group("Header Files\\Conventions"    FILES ${CONVENTION_HEADERS})
 Source_Group("Source Files\\Conventions"    FILES ${CONVENTION_SOURCES})
 
-# Set the directories to include
-Include_Directories(thirdparty/AsmJit/include)
 
+# =============================================================================
+# >> COMPILER FLAGS
+# =============================================================================
 # Disable optimization in release mode
 Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
 
-# Tell cmake to build a static library
+# Create a static library
 Add_Library(DynamicHooks STATIC ${DYNAMICHOOKS_FILES})
 
-# Set the thirdparty link libraries
+
+# =============================================================================
+# >> INCLUDES
+# =============================================================================
+Include_Directories(thirdparty/AsmJit/include)
+
+
+# =============================================================================
+# >> LINK LIBRARIES
+# =============================================================================
 If(WIN32)
     Target_Link_Libraries(DynamicHooks
         debug ../../thirdparty/AsmJit/lib/AsmJit_d
