@@ -1,4 +1,5 @@
 os: linux
 language: cpp
 compiler: gcc
-script: "sudo ./build-unix-x86-rel.sh"
+before_script: sudo chmod +x build-unix-x86-rel.sh
+script: sudo ./build-unix-x86-rel.sh
