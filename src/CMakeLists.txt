@@ -57,7 +57,9 @@ Source_Group("Source Files\\Conventions"    FILES ${CONVENTION_SOURCES})
 # >> COMPILER FLAGS
 # =============================================================================
 # Disable optimization in release mode
-Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
+If(WIN32)
+    Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
+Endif()
 
 # Create a static library
 Add_Library(DynamicHooks STATIC ${DYNAMICHOOKS_FILES})
@@ -73,14 +75,7 @@ Include_Directories(thirdparty/AsmJit/include)
 # >> LINK LIBRARIES
 # =============================================================================
 If(WIN32)
-    Target_Link_Libraries(DynamicHooks
-        debug ../../thirdparty/AsmJit/lib/AsmJit_d
-        optimized ../../thirdparty/AsmJit/lib/AsmJit
-    )
+    Target_Link_Libraries(DynamicHooks ../../thirdparty/AsmJit/lib/AsmJit)
 Else()
-    If(CMAKE_BUILD_TYPE MATCHES Debug)
-        Target_Link_Libraries(DynamicHooks ${CMAKE_SOURCE_DIR}/thirdparty/AsmJit/lib/libAsmJit_d.a)
-    Else()
-        Target_Link_Libraries(DynamicHooks ${CMAKE_SOURCE_DIR}/thirdparty/AsmJit/lib/libAsmJit.a)
-    Endif()
+    Target_Link_Libraries(DynamicHooks ${CMAKE_SOURCE_DIR}/thirdparty/AsmJit/lib/libAsmJit.a)
 Endif()

@@ -12,18 +12,12 @@ Project(Tests)
 macro (create_dynamic_hooks_test name)
     add_executable(${ARGV})
     if (TARGET ${name})
-        target_link_libraries(${name} ../vs2010-x86/Release/DynamicHooks)
         If(WIN32)
-            Target_Link_Libraries(${name}
-                debug ../../src/thirdparty/AsmJit/lib/AsmJit_d
-                optimized ../../src/thirdparty/AsmJit/lib/AsmJit
-            )
+            Target_Link_Libraries(${name} ../vs2010-x86/Release/DynamicHooks)
+            Target_Link_Libraries(${name} ../../src/thirdparty/AsmJit/lib/AsmJit)
         Else()
-            If(CMAKE_BUILD_TYPE MATCHES Debug)
-                Target_Link_Libraries(${name} ../../src/thirdparty/AsmJit/lib/libAsmJit_d.a)
-            Else()
-                Target_Link_Libraries(${name} ../../src/thirdparty/AsmJit/lib/libAsmJit.a)
-            Endif()
+            Target_Link_Libraries(${name} $ENV{PWD}/../unix-x86/libDynamicHooks.a)
+            Target_Link_Libraries(${name} $ENV{PWD}/../../src/thirdparty/AsmJit/lib/libAsmJit.a)
         Endif()
     endif()
 endmacro()
@@ -33,7 +27,9 @@ endmacro()
 # >> COMPILER FLAGS
 # =============================================================================
 # Disable optimization in release mode
-Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
+If(WIN32)
+    Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
+Endif()
 
 
 # =============================================================================
@@ -46,6 +42,10 @@ Include_Directories(../src/thirdparty/AsmJit/include)
 # =============================================================================
 # >> TESTS
 # =============================================================================
-create_dynamic_hooks_test(MS_CDECL1 ms_cdecl1.cpp)
-create_dynamic_hooks_test(MS_CDECL2 ms_cdecl2.cpp)
-create_dynamic_hooks_test(MS_THISCALL1 ms_thiscall1.cpp)
+If(WIN32)
+    create_dynamic_hooks_test(MS_CDECL1 ms_cdecl1.cpp)
+    create_dynamic_hooks_test(MS_CDECL2 ms_cdecl2.cpp)
+    create_dynamic_hooks_test(MS_THISCALL1 ms_thiscall1.cpp)
+Else()
+    create_dynamic_hooks_test(GCC_CDECL1 gcc_cdecl1.cpp)
+Endif()
