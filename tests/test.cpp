@@ -54,22 +54,41 @@ void pause()
 // ============================================================================
 // >> cdecl test
 // ============================================================================
+int g_iRet = 0;
+
 int MyFunc(int x, int y)
 {
 	cout << x << " Orignal func " << y << endl;
+	if (g_iRet == 0)
+	{
+		cout << "Calling MyFunc again..." << endl;
+		g_iRet = 1;
+		MyFunc(1, 2);
+		cout << "Called" << endl;
+	}
+
 	return x + y;
 }
+
+void* g_pRetAddr = NULL;
+int g_iCounter = 0;
 
 bool MyHook(HookType_t eHookType, CHook* pHook)
 {
 	cout << "MyHook " << eHookType << endl;
-	cout << " 8: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(8) << endl;
-	cout << " 4: " << pHook->m_pRegisters->m_esp->GetPointerValue<int>(4) << endl;
-	cout << "Return value: " << pHook->m_pRegisters->m_eax->GetValue<int>() << endl;
-	
 	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
 	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
 	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
+	/*
+	g_iCounter++;
+	if (!g_pRetAddr)
+		g_pRetAddr = pHook->m_pRetAddr;
+	else if (g_iCounter == 4)
+	{
+		//
+		pHook->m_pRetAddr = g_pRetAddr;
+	}
+	*/
 	
 	pHook->SetReturnValue<int>(1337);
 	return false;
@@ -110,6 +129,27 @@ bool MyHook2(HookType_t eHookType, CHook* pHook)
 	return false;
 }
 
+// ============================================================================
+// >> cdecl test
+// ============================================================================
+void MyFunc2()
+{
+	puts("Original function");
+	if (g_iCounter == 0)
+	{
+		puts("Calling again");
+		g_iCounter++;
+		MyFunc2();
+	}
+	
+}
+
+bool MyHook3(HookType_t eHookType, CHook* pHook)
+{
+	cout << "MyHook3 " << eHookType << endl;
+	return false;
+}
+
 
 // ============================================================================
 // >> main
@@ -141,10 +181,23 @@ int main()
 
 	// Call the function
 	cout << "End result: " << MyFunc(3, 10) << endl << endl;
+	
     
+	
+	std::vector<DataType_t> vecArgTypes3;
+
+	// Hook function
+	pHook = pHookMngr->HookFunction((void *) &MyFunc2, new x86MsCdecl(vecArgTypes3, DATA_TYPE_VOID));
+	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook3);
+	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook3);
+
+	MyFunc2();
+	puts("END");
+
 	/*
 		THISCALL test
 	*/
+	
 	cout << "THISCALL test" << endl;
 
 	int (__thiscall Entity::*func)(int, int) = &Entity::AddHealth;
@@ -163,13 +216,14 @@ int main()
 	
 	// Call the function
 	Entity e;
-	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
 	cout << "this pointer: " << (int) &e << endl;
-
+	cout << "End result: " << e.AddHealth(3, 10) << endl << endl;
+	
 
 	/*
 		Clean Up
 	*/
+	pause();
 	pHookMngr->UnhookAllFunctions();
 	pause();
 	return 0;
