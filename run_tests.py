@@ -35,7 +35,7 @@ def main(args):
         success_count, test_count)
         
     #if test_count != success_count:
-    sys.exit(0)
+    sys.exit(1)
 
 if __name__ == '__main__':
     main(sys.argv)
