@@ -34,8 +34,8 @@ def main(args):
     print '{0} of {1} tests finished sucessfully.'.format(
         success_count, test_count)
         
-    #if test_count != success_count:
-    sys.exit(1)
+    if test_count != success_count:
+        sys.exit(1)
 
 if __name__ == '__main__':
     main(sys.argv)

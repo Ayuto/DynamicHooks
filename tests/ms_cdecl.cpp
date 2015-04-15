@@ -31,6 +31,7 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
+#include "assert.h"
 #include <iostream>
 using namespace std;
 
@@ -42,15 +43,35 @@ using namespace std;
 // ============================================================================
 int MyFunc(int x, int y)
 {
-	return x + y;
+	assert(x == 3);
+	assert(y == 10);
+
+	int result = x + y;
+	assert(result == 13);
+
+	return result;
 }
 
-bool MyHook(HookType_t eHookType, CHook* pHook)
+bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 {
-	cout << "MyHook " << eHookType << endl;
-	cout << "Arg 0: " << pHook->GetArgument<int>(0) << endl;
-	cout << "Arg 1: " << pHook->GetArgument<int>(1) << endl;
-	cout << "Return value: " << pHook->GetReturnValue<int>() << endl;
+	int x = pHook->GetArgument<int>(0);
+	assert(x == 3);
+
+	int y = pHook->GetArgument<int>(1);
+	assert(y == 10);
+	return false;
+}
+
+bool PostMyFunc(HookType_t eHookType, CHook* pHook)
+{
+	int x = pHook->GetArgument<int>(0);
+	assert(x == 3);
+
+	int y = pHook->GetArgument<int>(1);
+	assert(y == 10);
+
+	int return_value = pHook->GetReturnValue<int>();
+	assert(return_value == 13);
 	
 	pHook->SetReturnValue<int>(1337);
 	return false;
@@ -63,20 +84,25 @@ bool MyHook(HookType_t eHookType, CHook* pHook)
 int main()
 {
 	CHookManager* pHookMngr = GetHookManager();
-	CHook* pHook = NULL;
 
 	// Prepare calling convention
 	std::vector<DataType_t> vecArgTypes;
 	vecArgTypes.push_back(DATA_TYPE_INT);
 	vecArgTypes.push_back(DATA_TYPE_INT);
 
-	// Hook function
-	pHook = pHookMngr->HookFunction((void *) &MyFunc, new x86MsCdecl(vecArgTypes, DATA_TYPE_INT));
-	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &MyHook);
-	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &MyHook);
+	// Hook the function
+	CHook* pHook = pHookMngr->HookFunction(
+		(void *) &MyFunc,
+		new x86MsCdecl(vecArgTypes, DATA_TYPE_INT)
+	);
+
+	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &PreMyFunc);
+	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &PostMyFunc);
 
 	// Call the function
-	cout << "End result: " << MyFunc(3, 10) << endl << endl;
+	int return_value = MyFunc(3, 10);
+	assert(return_value == 1337);
+
 	pHookMngr->UnhookAllFunctions();
 	return 0;
 }

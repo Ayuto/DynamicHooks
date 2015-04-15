@@ -232,12 +232,12 @@ void* CHook::CreatePostCallback()
 	Write_RestoreRegisters(a);
 
 	// Save scratch registers that are used by GetReturnAddress
-	void* pEAX2 = NULL;
-	void* pECX2 = NULL;
-	void* pEDX2 = NULL;
-	a.mov(dword_ptr_abs(&pEAX2), eax);
-	a.mov(dword_ptr_abs(&pECX2), ecx);
-	a.mov(dword_ptr_abs(&pEDX2), edx);
+	void* pEAX3 = NULL;
+	void* pECX = NULL;
+	void* pEDX = NULL;
+	a.mov(dword_ptr_abs(&pEAX3), eax);
+	a.mov(dword_ptr_abs(&pECX), ecx);
+	a.mov(dword_ptr_abs(&pEDX), edx);
 	
 	// Get the original return address
 	void* (__cdecl CHook::*GetReturnAddress)(void*) = &CHook::GetReturnAddress;
@@ -251,9 +251,9 @@ void* CHook::CreatePostCallback()
 	a.mov(dword_ptr_abs(&pRetAddr), eax);
 	
 	// Restore scratch registers
-	a.mov(eax, dword_ptr_abs(&pEAX2));
-	a.mov(ecx, dword_ptr_abs(&pECX2));
-	a.mov(edx, dword_ptr_abs(&pEDX2));
+	a.mov(eax, dword_ptr_abs(&pEAX3));
+	a.mov(ecx, dword_ptr_abs(&pECX));
+	a.mov(edx, dword_ptr_abs(&pEDX));
 
 	// Add the bytes again to the stack (stack size + return address), so we
 	// don't corrupt the stack.
