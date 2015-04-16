@@ -35,6 +35,8 @@
 
 #ifndef _WIN32
 
+#include <inttypes.h>
+
 #ifndef _GNU_SOURCE
 #  define _GNU_SOURCE
 #endif // _GNU_SOURCE
@@ -66,7 +68,7 @@ void check_thunks(unsigned char *dest, unsigned char *pc)
 	/* Step write address back 4 to the start of the function address */
 	unsigned char *writeaddr = dest - 4;
 	unsigned char *calloffset = *(unsigned char **)writeaddr;
-	unsigned char *calladdr = (unsigned char *)(dest + (unsigned int)calloffset);
+	unsigned char *calladdr = (unsigned char *)(dest + (intptr_t)calloffset);
 
 	/* Lookup name of function being called */
 	if ((*calladdr == 0x8B) && (*(calladdr+2) == 0x24) && (*(calladdr+3) == 0xC3))
