@@ -40,7 +40,7 @@
 #include "registers.h"
 #include "convention.h"
 
-#include "asmjit.h"
+#include "AsmJit.h"
 using namespace AsmJit;
 
 

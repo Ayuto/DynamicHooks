@@ -35,9 +35,6 @@
 #include "utilities.h"
 #include "asm.h"
 
-#include "AsmJit.h"
-using namespace AsmJit;
-
 
 // ============================================================================
 // >> DEFINITIONS
