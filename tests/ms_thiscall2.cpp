@@ -54,47 +54,35 @@ MyClass* g_pMyClass = NULL;
 class MyClass
 {
 public:
-	int MyFunc(int x, int y)
+	int MyFunc(int x)
 	{
 		g_iMyFuncCallCount++;
 		assert(this == g_pMyClass);
-		assert(x == 3);
-		assert(y == 10);
+		assert(x >= 0 && x <= 3);
+		if (x == 3)
+			return x;
 
-		int result = x + y;
-		assert(result == 13);
-
-		return result;
+		return MyFunc(x + 1);
 	}
 };
 
 bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 {
 	g_iPreMyFuncCallCount++;
+
 	MyClass* pMyClass = pHook->GetArgument<MyClass *>(0);
 	assert(pMyClass == g_pMyClass);
 
 	int x = pHook->GetArgument<int>(1);
-	assert(x == 3);
-
-	int y = pHook->GetArgument<int>(2);
-	assert(y == 10);
+	assert(x >= 0 && x <= 3);
 	return false;
 }
 
 bool PostMyFunc(HookType_t eHookType, CHook* pHook)
 {
 	g_iPostMyFuncCallCount++;
-	int x = pHook->GetArgument<int>(1);
-	assert(x == 3);
-
-	int y = pHook->GetArgument<int>(2);
-	assert(y == 10);
-
 	int return_value = pHook->GetReturnValue<int>();
-	assert(return_value == 13);
-	
-	pHook->SetReturnValue<int>(1337);
+	assert(return_value == 3);
 	return false;
 }
 
@@ -106,12 +94,11 @@ int main()
 {
 	CHookManager* pHookMngr = GetHookManager();
 
-	int (__thiscall MyClass::*MyFunc)(int, int) = &MyClass::MyFunc;
+	int (__thiscall MyClass::*MyFunc)(int) = &MyClass::MyFunc;
 
 	// Prepare calling convention
 	std::vector<DataType_t> vecArgTypes;
 	vecArgTypes.push_back(DATA_TYPE_POINTER);
-	vecArgTypes.push_back(DATA_TYPE_INT);
 	vecArgTypes.push_back(DATA_TYPE_INT);
 
 	// Hook the function
@@ -127,12 +114,12 @@ int main()
 	MyClass a;
 	g_pMyClass = &a;
 
-	int return_value = a.MyFunc(3, 10);
+	int return_value = a.MyFunc(0);
 	
-	assert(g_iMyFuncCallCount == 1);
-	assert(g_iPreMyFuncCallCount == 1);
-	assert(g_iPostMyFuncCallCount == 1);
-	assert(return_value == 1337);
+	assert(g_iMyFuncCallCount == 4);
+	assert(g_iPreMyFuncCallCount == 4);
+	assert(g_iPostMyFuncCallCount == 4);
+	assert(return_value == 3);
 
 	pHookMngr->UnhookAllFunctions();
 	return 0;

@@ -5,16 +5,16 @@
 * =============================================================================
 *
 * This software is provided 'as-is', without any express or implied warranty.
-* In no event will the authors be held liable for any damages arising from 
+* In no event will the authors be held liable for any damages arising from
 * the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose, 
-* including commercial applications, and to alter it and redistribute it 
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
 * freely, subject to the following restrictions:
 *
-* 1. The origin of this software must not be misrepresented; you must not 
-* claim that you wrote the original software. If you use this software in a 
-* product, an acknowledgment in the product documentation would be 
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software in a
+* product, an acknowledgment in the product documentation would be
 * appreciated but is not required.
 *
 * 2. Altered source versions must be plainly marked as such, and must not be
@@ -34,7 +34,7 @@
 #include "assert.h"
 
 #include "manager.h"
-#include "conventions/x86MsThiscall.h"
+#include "conventions/x86GccThiscall.h"
 
 
 // ============================================================================
@@ -46,7 +46,7 @@ int g_iPostMyFuncCallCount = 0;
 
 
 // ============================================================================
-// >> thiscall test
+// >> cdecl test
 // ============================================================================
 class MyClass;
 MyClass* g_pMyClass = NULL;
@@ -93,7 +93,7 @@ bool PostMyFunc(HookType_t eHookType, CHook* pHook)
 
 	int return_value = pHook->GetReturnValue<int>();
 	assert(return_value == 13);
-	
+
 	pHook->SetReturnValue<int>(1337);
 	return false;
 }
@@ -106,7 +106,7 @@ int main()
 {
 	CHookManager* pHookMngr = GetHookManager();
 
-	int (__thiscall MyClass::*MyFunc)(int, int) = &MyClass::MyFunc;
+	int (MyClass::*MyFunc)(int, int) = &MyClass::MyFunc;
 
 	// Prepare calling convention
 	std::vector<DataType_t> vecArgTypes;
@@ -117,7 +117,7 @@ int main()
 	// Hook the function
 	CHook* pHook = pHookMngr->HookFunction(
 		(void *&) MyFunc,
-		new x86MsThiscall(vecArgTypes, DATA_TYPE_INT)
+		new x86GccThiscall(vecArgTypes, DATA_TYPE_INT)
 	);
 
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &PreMyFunc);
@@ -128,7 +128,7 @@ int main()
 	g_pMyClass = &a;
 
 	int return_value = a.MyFunc(3, 10);
-	
+
 	assert(g_iMyFuncCallCount == 1);
 	assert(g_iPreMyFuncCallCount == 1);
 	assert(g_iPostMyFuncCallCount == 1);
