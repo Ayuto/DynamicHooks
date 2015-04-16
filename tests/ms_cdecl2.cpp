@@ -36,11 +36,21 @@
 #include "manager.h"
 #include "conventions/x86MsCdecl.h"
 
+
+// ============================================================================
+// >> GLOBAL VARIABLES
+// ============================================================================
+int g_iMyFuncCallCount = 0;
+int g_iPreMyFuncCallCount = 0;
+int g_iPostMyFuncCallCount = 0;
+
+
 // ============================================================================
 // >> cdecl test
 // ============================================================================
 int MyFunc(int x)
 {
+	g_iMyFuncCallCount++;
 	assert(x >= 0 && x <= 3);
 	if (x == 3)
 		return x;
@@ -50,6 +60,7 @@ int MyFunc(int x)
 
 bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 {
+	g_iPreMyFuncCallCount++;
 	int x = pHook->GetArgument<int>(0);
 	assert(x >= 0 && x <= 3);
 	return false;
@@ -57,6 +68,7 @@ bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 
 bool PostMyFunc(HookType_t eHookType, CHook* pHook)
 {
+	g_iPostMyFuncCallCount++;
 	int return_value = pHook->GetReturnValue<int>();
 	assert(return_value == 3);
 	return false;
@@ -86,6 +98,10 @@ int main()
 
 	// Call the function
 	int return_value = MyFunc(0);
+	
+	assert(g_iMyFuncCallCount == 4);
+	assert(g_iPreMyFuncCallCount == 4);
+	assert(g_iPostMyFuncCallCount == 4);
 	assert(return_value == 3);
 
 	pHookMngr->UnhookAllFunctions();

@@ -36,6 +36,15 @@
 #include "manager.h"
 #include "conventions/x86MsThiscall.h"
 
+
+// ============================================================================
+// >> GLOBAL VARIABLES
+// ============================================================================
+int g_iMyFuncCallCount = 0;
+int g_iPreMyFuncCallCount = 0;
+int g_iPostMyFuncCallCount = 0;
+
+
 // ============================================================================
 // >> cdecl test
 // ============================================================================
@@ -47,6 +56,7 @@ class MyClass
 public:
 	int MyFunc(int x, int y)
 	{
+		g_iMyFuncCallCount++;
 		assert(this == g_pMyClass);
 		assert(x == 3);
 		assert(y == 10);
@@ -60,6 +70,7 @@ public:
 
 bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 {
+	g_iPreMyFuncCallCount++;
 	MyClass* pMyClass = pHook->GetArgument<MyClass *>(0);
 	assert(pMyClass == g_pMyClass);
 
@@ -73,6 +84,7 @@ bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 
 bool PostMyFunc(HookType_t eHookType, CHook* pHook)
 {
+	g_iPostMyFuncCallCount++;
 	int x = pHook->GetArgument<int>(1);
 	assert(x == 3);
 
@@ -116,6 +128,10 @@ int main()
 	g_pMyClass = &a;
 
 	int return_value = a.MyFunc(3, 10);
+	
+	assert(g_iMyFuncCallCount == 1);
+	assert(g_iPreMyFuncCallCount == 1);
+	assert(g_iPostMyFuncCallCount == 1);
 	assert(return_value == 1337);
 
 	pHookMngr->UnhookAllFunctions();
