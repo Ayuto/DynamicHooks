@@ -1,5 +1,9 @@
 os: linux
 language: cpp
 compiler: gcc
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get -qq install gcc-multilib g++-multilib
+    
 before_script: sudo chmod +x build-unix-x86-rel.sh
 script: sudo ./build-unix-x86-rel.sh

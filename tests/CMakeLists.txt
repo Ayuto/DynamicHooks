@@ -31,6 +31,8 @@ If(WIN32)
     Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
 Endif()
 
+Set(CMAKE_CXX_FLAGS "-m32")
+
 
 # =============================================================================
 # >> INCLUDES
