@@ -30,157 +30,169 @@
 
 #include "registers.h"
 
-CRegisters::CRegisters()
+CRegisters::CRegisters(std::list<Register_t> registers)
 {	
 	// ========================================================================
 	// >> 8-bit General purpose registers
 	// ========================================================================
-	m_al = new CRegister(1);
-	m_cl = new CRegister(1);
-	m_dl = new CRegister(1);
-	m_bl = new CRegister(1);
+	m_al = CreateRegister(registers, AL, 1);
+	m_cl = CreateRegister(registers, CL, 1);
+	m_dl = CreateRegister(registers, DL, 1);
+	m_bl = CreateRegister(registers, BL, 1);
 
 	// 64-bit mode only
-	m_spl = new CRegister(1);
-	m_bpl = new CRegister(1);
-	m_sil = new CRegister(1);
-	m_dil = new CRegister(1);
-	m_r8b = new CRegister(1);
-	m_r9b = new CRegister(1);
-	m_r10b = new CRegister(1);
-	m_r11b = new CRegister(1);
-	m_r12b = new CRegister(1);
-	m_r13b = new CRegister(1);
-	m_r14b = new CRegister(1);
-	m_r15b = new CRegister(1);
+	/*
+	m_spl = CreateRegister(registers, SPL, 1);
+	m_bpl = CreateRegister(registers, BPL, 1);
+	m_sil = CreateRegister(registers, SIL, 1);
+	m_dil = CreateRegister(registers, DIL, 1);
+	m_r8b = CreateRegister(registers, R8B, 1);
+	m_r9b = CreateRegister(registers, R9B, 1);
+	m_r10b = CreateRegister(registers, R10B, 1);
+	m_r11b = CreateRegister(registers, R11B, 1);
+	m_r12b = CreateRegister(registers, R12B, 1);
+	m_r13b = CreateRegister(registers, R13B, 1);
+	m_r14b = CreateRegister(registers, R14B, 1);
+	m_r15b = CreateRegister(registers, R15B, 1);
+	*/
 
-	m_ah = new CRegister(1);
-	m_ch = new CRegister(1);
-	m_dh = new CRegister(1);
-	m_bh = new CRegister(1);
+	m_ah = CreateRegister(registers, AH, 1);
+	m_ch = CreateRegister(registers, CH, 1);
+	m_dh = CreateRegister(registers, DH, 1);
+	m_bh = CreateRegister(registers, BH, 1);
 	
 	// ========================================================================
 	// >> 16-bit General purpose registers
 	// ========================================================================
-	m_ax = new CRegister(2);
-	m_cx = new CRegister(2);
-	m_dx = new CRegister(2);
-	m_bx = new CRegister(2);
-	m_sp = new CRegister(2);
-	m_bp = new CRegister(2);
-	m_si = new CRegister(2);
-	m_di = new CRegister(2);
+	m_ax = CreateRegister(registers, AX, 2);
+	m_cx = CreateRegister(registers, CX, 2);
+	m_dx = CreateRegister(registers, DX, 2);
+	m_bx = CreateRegister(registers, BX, 2);
+	m_sp = CreateRegister(registers, SP, 2);
+	m_bp = CreateRegister(registers, BP, 2);
+	m_si = CreateRegister(registers, SI, 2);
+	m_di = CreateRegister(registers, DI, 2);
 
 	// 64-bit mode only
-	m_r8w = new CRegister(2);
-	m_r9w = new CRegister(2);
-	m_r10w = new CRegister(2);
-	m_r11w = new CRegister(2);
-	m_r12w = new CRegister(2);
-	m_r13w = new CRegister(2);
-	m_r14w = new CRegister(2);
-	m_r15w = new CRegister(2);
+	/*
+	m_r8w = CreateRegister(registers, R8W, 2);
+	m_r9w = CreateRegister(registers, R9W, 2);
+	m_r10w = CreateRegister(registers, R10W, 2);
+	m_r11w = CreateRegister(registers, R11W, 2);
+	m_r12w = CreateRegister(registers, R12W, 2);
+	m_r13w = CreateRegister(registers, R13W, 2);
+	m_r14w = CreateRegister(registers, R14W, 2);
+	m_r15w = CreateRegister(registers, R14W, 2);
+	*/
 
 	// ========================================================================
 	// >> 32-bit General purpose registers
 	// ========================================================================
-	m_eax = new CRegister(4);
-	m_ecx = new CRegister(4);
-	m_edx = new CRegister(4);
-	m_ebx = new CRegister(4);
-	m_esp = new CRegister(4);
-	m_ebp = new CRegister(4);
-	m_esi = new CRegister(4);
-	m_edi = new CRegister(4);
+	m_eax = CreateRegister(registers, EAX, 4);
+	m_ecx = CreateRegister(registers, ECX, 4);
+	m_edx = CreateRegister(registers, EDX, 4);
+	m_ebx = CreateRegister(registers, EBX, 4);
+	m_esp = CreateRegister(registers, ESP, 4);
+	m_ebp = CreateRegister(registers, EBP, 4);
+	m_esi = CreateRegister(registers, ESI, 4);
+	m_edi = CreateRegister(registers, EDI, 4);
 
 	// 64-bit mode only
-	m_r8d = new CRegister(4);
-	m_r9d = new CRegister(4);
-	m_r10d = new CRegister(4);
-	m_r11d = new CRegister(4);
-	m_r12d = new CRegister(4);
-	m_r13d = new CRegister(4);
-	m_r14d = new CRegister(4);
-	m_r15d = new CRegister(4);
+	/*
+	m_r8d = CreateRegister(registers, R8D, 4);
+	m_r9d = CreateRegister(registers, R9D, 4);
+	m_r10d = CreateRegister(registers, R10D, 4);
+	m_r11d = CreateRegister(registers, R11D, 4);
+	m_r12d = CreateRegister(registers, R12D, 4);
+	m_r13d = CreateRegister(registers, R13D, 4);
+	m_r14d = CreateRegister(registers, R14D, 4);
+	m_r15d = CreateRegister(registers, R15D, 4);
+	*/
 
 	// ========================================================================
 	// >> 64-bit General purpose registers
 	// ========================================================================
 	// 64-bit mode only
-	m_rax = new CRegister(8);
-	m_rcx = new CRegister(8);
-	m_rdx = new CRegister(8);
-	m_rbx = new CRegister(8);
-	m_rsp = new CRegister(8);
-	m_rbp = new CRegister(8);
-	m_rsi = new CRegister(8);
-	m_rdi = new CRegister(8);
+	/*
+	m_rax = CreateRegister(registers, RAX, 8);
+	m_rcx = CreateRegister(registers, RCX, 8);
+	m_rdx = CreateRegister(registers, RDX, 8);
+	m_rbx = CreateRegister(registers, RBX, 8);
+	m_rsp = CreateRegister(registers, RSP, 8);
+	m_rbp = CreateRegister(registers, RBP, 8);
+	m_rsi = CreateRegister(registers, RSI, 8);
+	m_rdi = CreateRegister(registers, RDI, 8);
+	*/
 	
 	// 64-bit mode only
-	m_r8 = new CRegister(8);
-	m_r9 = new CRegister(8);
-	m_r10 = new CRegister(8);
-	m_r11 = new CRegister(8);
-	m_r12 = new CRegister(8);
-	m_r13 = new CRegister(8);
-	m_r14 = new CRegister(8);
-	m_r15 = new CRegister(8);
+	/*
+	m_r8 = CreateRegister(registers, R8, 8);
+	m_r9 = CreateRegister(registers, R9, 8);
+	m_r10 = CreateRegister(registers, R10, 8);
+	m_r11 = CreateRegister(registers, R11, 8);
+	m_r12 = CreateRegister(registers, R12, 8);
+	m_r13 = CreateRegister(registers, R13, 8);
+	m_r14 = CreateRegister(registers, R14, 8);
+	m_r15 = CreateRegister(registers, R15, 8);
+	*/
 
 	// ========================================================================
 	// >> 64-bit MM (MMX) registers
 	// ========================================================================
-	m_mm0 = new CRegister(8);
-	m_mm1 = new CRegister(8);
-	m_mm2 = new CRegister(8);
-	m_mm3 = new CRegister(8);
-	m_mm4 = new CRegister(8);
-	m_mm5 = new CRegister(8);
-	m_mm6 = new CRegister(8);
-	m_mm7 = new CRegister(8);
+	m_mm0 = CreateRegister(registers, MM0, 8);
+	m_mm1 = CreateRegister(registers, MM1, 8);
+	m_mm2 = CreateRegister(registers, MM2, 8);
+	m_mm3 = CreateRegister(registers, MM3, 8);
+	m_mm4 = CreateRegister(registers, MM4, 8);
+	m_mm5 = CreateRegister(registers, MM5, 8);
+	m_mm6 = CreateRegister(registers, MM6, 8);
+	m_mm7 = CreateRegister(registers, MM7, 8);
 
 	// ========================================================================
 	// >> 128-bit XMM registers
 	// ========================================================================
-	m_xmm0 = new CRegister(16);
-	m_xmm1 = new CRegister(16);
-	m_xmm2 = new CRegister(16);
-	m_xmm3 = new CRegister(16);
-	m_xmm4 = new CRegister(16);
-	m_xmm5 = new CRegister(16);
-	m_xmm6 = new CRegister(16);
-	m_xmm7 = new CRegister(16);
+	m_xmm0 = CreateRegister(registers, XMM0, 16);
+	m_xmm1 = CreateRegister(registers, XMM1, 16);
+	m_xmm2 = CreateRegister(registers, XMM2, 16);
+	m_xmm3 = CreateRegister(registers, XMM3, 16);
+	m_xmm4 = CreateRegister(registers, XMM4, 16);
+	m_xmm5 = CreateRegister(registers, XMM5, 16);
+	m_xmm6 = CreateRegister(registers, XMM6, 16);
+	m_xmm7 = CreateRegister(registers, XMM7, 16);
 
 	// 64-bit mode only
-	m_xmm8 = new CRegister(16);
-	m_xmm9 = new CRegister(16);
-	m_xmm10 = new CRegister(16);
-	m_xmm11 = new CRegister(16);
-	m_xmm12 = new CRegister(16);
-	m_xmm13 = new CRegister(16);
-	m_xmm14 = new CRegister(16);
-	m_xmm15 = new CRegister(16);
+	/*
+	m_xmm8 = CreateRegister(registers, XMM8, 16);
+	m_xmm9 = CreateRegister(registers, XMM9, 16);
+	m_xmm10 = CreateRegister(registers, XMM10, 16);
+	m_xmm11 = CreateRegister(registers, XMM11, 16);
+	m_xmm12 = CreateRegister(registers, XMM12, 16);
+	m_xmm13 = CreateRegister(registers, XMM13, 16);
+	m_xmm14 = CreateRegister(registers, XMM14, 16);
+	m_xmm15 = CreateRegister(registers, XMM15, 16);
+	*/
 
 	// ========================================================================
 	// >> 16-bit Segment registers
 	// ========================================================================
-	m_cs = new CRegister(2);
-	m_ss = new CRegister(2);
-	m_ds = new CRegister(2);
-	m_es = new CRegister(2);
-	m_fs = new CRegister(2);
-	m_gs = new CRegister(2);
+	m_cs = CreateRegister(registers, CS, 2);
+	m_ss = CreateRegister(registers, SS, 2);
+	m_ds = CreateRegister(registers, DS, 2);
+	m_es = CreateRegister(registers, ES, 2);
+	m_fs = CreateRegister(registers, FS, 2);
+	m_gs = CreateRegister(registers, GS, 2);
 	
 	// ========================================================================
 	// >> 80-bit FPU registers
 	// ========================================================================
-	m_st0 = new CRegister(10);
-	m_st1 = new CRegister(10);
-	m_st2 = new CRegister(10);
-	m_st3 = new CRegister(10);
-	m_st4 = new CRegister(10);
-	m_st5 = new CRegister(10);
-	m_st6 = new CRegister(10);
-	m_st7 = new CRegister(10);
+	m_st0 = CreateRegister(registers, ST0, 10);
+	m_st1 = CreateRegister(registers, ST1, 10);
+	m_st2 = CreateRegister(registers, ST2, 10);
+	m_st3 = CreateRegister(registers, ST3, 10);
+	m_st4 = CreateRegister(registers, ST4, 10);
+	m_st5 = CreateRegister(registers, ST5, 10);
+	m_st6 = CreateRegister(registers, ST6, 10);
+	m_st7 = CreateRegister(registers, ST7, 10);
 }
 
 CRegisters::~CRegisters()
@@ -188,150 +200,182 @@ CRegisters::~CRegisters()
 	// ========================================================================
 	// >> 8-bit General purpose registers
 	// ========================================================================
-	delete m_al;
-	delete m_cl;
-	delete m_dl;
-	delete m_bl;
+	DeleteRegister(m_al);
+	DeleteRegister(m_cl);
+	DeleteRegister(m_dl);
+	DeleteRegister(m_bl);
 
 	// 64-bit mode only
-	delete m_spl;
-	delete m_bpl;
-	delete m_sil;
-	delete m_dil;
-	delete m_r8b;
-	delete m_r9b;
-	delete m_r10b;
-	delete m_r11b;
-	delete m_r12b;
-	delete m_r13b;
-	delete m_r14b;
-	delete m_r15b;
+	/*
+	DeleteRegister(m_spl);
+	DeleteRegister(m_bpl);
+	DeleteRegister(m_sil);
+	DeleteRegister(m_dil);
+	DeleteRegister(m_r8b);
+	DeleteRegister(m_r9b);
+	DeleteRegister(m_r10b);
+	DeleteRegister(m_r11b);
+	DeleteRegister(m_r12b);
+	DeleteRegister(m_r13b);
+	DeleteRegister(m_r14b);
+	DeleteRegister(m_r15b);
+	*/
 
-	delete m_ah;
-	delete m_ch;
-	delete m_dh;
-	delete m_bh;
+	DeleteRegister(m_ah);
+	DeleteRegister(m_ch);
+	DeleteRegister(m_dh);
+	DeleteRegister(m_bh);
 	
 	// ========================================================================
 	// >> 16-bit General purpose registers
 	// ========================================================================
-	delete m_ax;
-	delete m_cx;
-	delete m_dx;
-	delete m_bx;
-	delete m_sp;
-	delete m_bp;
-	delete m_si;
-	delete m_di;
+	DeleteRegister(m_ax);
+	DeleteRegister(m_cx);
+	DeleteRegister(m_dx);
+	DeleteRegister(m_bx);
+	DeleteRegister(m_sp);
+	DeleteRegister(m_bp);
+	DeleteRegister(m_si);
+	DeleteRegister(m_di);
 
 	// 64-bit mode only
-	delete m_r8w;
-	delete m_r9w;
-	delete m_r10w;
-	delete m_r11w;
-	delete m_r12w;
-	delete m_r13w;
-	delete m_r14w;
-	delete m_r15w;
+	/*
+	DeleteRegister(m_r8w);
+	DeleteRegister(m_r9w);
+	DeleteRegister(m_r10w);
+	DeleteRegister(m_r11w);
+	DeleteRegister(m_r12w);
+	DeleteRegister(m_r13w);
+	DeleteRegister(m_r14w);
+	DeleteRegister(m_r15w);
+	*/
 
 	// ========================================================================
 	// >> 32-bit General purpose registers
 	// ========================================================================
-	delete m_eax;
-	delete m_ecx;
-	delete m_edx;
-	delete m_ebx;
-	delete m_esp;
-	delete m_ebp;
-	delete m_esi;
-	delete m_edi;
+	DeleteRegister(m_eax);
+	DeleteRegister(m_ecx);
+	DeleteRegister(m_edx);
+	DeleteRegister(m_ebx);
+	DeleteRegister(m_esp);
+	DeleteRegister(m_ebp);
+	DeleteRegister(m_esi);
+	DeleteRegister(m_edi);
 
 	// 64-bit mode only
-	delete m_r8d;
-	delete m_r9d;
-	delete m_r10d;
-	delete m_r11d;
-	delete m_r12d;
-	delete m_r13d;
-	delete m_r14d;
-	delete m_r15d;
+	/*
+	DeleteRegister(m_r8d);
+	DeleteRegister(m_r9d);
+	DeleteRegister(m_r10d);
+	DeleteRegister(m_r11d);
+	DeleteRegister(m_r12d);
+	DeleteRegister(m_r13d);
+	DeleteRegister(m_r14d);
+	DeleteRegister(m_r15d);
+	*/
 
 	// ========================================================================
 	// >> 64-bit General purpose registers
 	// ========================================================================
 	// 64-bit mode only
-	delete m_rax;
-	delete m_rcx;
-	delete m_rdx;
-	delete m_rbx;
-	delete m_rsp;
-	delete m_rbp;
-	delete m_rsi;
-	delete m_rdi;
+	/*
+	DeleteRegister(m_rax);
+	DeleteRegister(m_rcx);
+	DeleteRegister(m_rdx);
+	DeleteRegister(m_rbx);
+	DeleteRegister(m_rsp);
+	DeleteRegister(m_rbp);
+	DeleteRegister(m_rsi);
+	DeleteRegister(m_rdi);
+	*/
 	
 	// 64-bit mode only
-	delete m_r8;
-	delete m_r9;
-	delete m_r10;
-	delete m_r11;
-	delete m_r12;
-	delete m_r13;
-	delete m_r14;
-	delete m_r15;
+	/*
+	DeleteRegister(m_r8);
+	DeleteRegister(m_r9);
+	DeleteRegister(m_r10);
+	DeleteRegister(m_r11);
+	DeleteRegister(m_r12);
+	DeleteRegister(m_r13);
+	DeleteRegister(m_r14);
+	DeleteRegister(m_r15);
+	*/
 
 	// ========================================================================
 	// >> 64-bit MM (MMX) registers
 	// ========================================================================
-	delete m_mm0;
-	delete m_mm1;
-	delete m_mm2;
-	delete m_mm3;
-	delete m_mm4;
-	delete m_mm5;
-	delete m_mm6;
-	delete m_mm7;
+	DeleteRegister(m_mm0);
+	DeleteRegister(m_mm1);
+	DeleteRegister(m_mm2);
+	DeleteRegister(m_mm3);
+	DeleteRegister(m_mm4);
+	DeleteRegister(m_mm5);
+	DeleteRegister(m_mm6);
+	DeleteRegister(m_mm7);
 
 	// ========================================================================
 	// >> 128-bit XMM registers
 	// ========================================================================
-	delete m_xmm0;
-	delete m_xmm1;
-	delete m_xmm2;
-	delete m_xmm3;
-	delete m_xmm4;
-	delete m_xmm5;
-	delete m_xmm6;
-	delete m_xmm7;
+	DeleteRegister(m_xmm0);
+	DeleteRegister(m_xmm1);
+	DeleteRegister(m_xmm2);
+	DeleteRegister(m_xmm3);
+	DeleteRegister(m_xmm4);
+	DeleteRegister(m_xmm5);
+	DeleteRegister(m_xmm6);
+	DeleteRegister(m_xmm7);
 
 	// 64-bit mode only
-	delete m_xmm8;
-	delete m_xmm9;
-	delete m_xmm10;
-	delete m_xmm11;
-	delete m_xmm12;
-	delete m_xmm13;
-	delete m_xmm14;
-	delete m_xmm15;
+	/*
+	DeleteRegister(m_xmm8);
+	DeleteRegister(m_xmm9);
+	DeleteRegister(m_xmm10);
+	DeleteRegister(m_xmm11);
+	DeleteRegister(m_xmm12);
+	DeleteRegister(m_xmm13);
+	DeleteRegister(m_xmm14);
+	DeleteRegister(m_xmm15);
+	*/
 
 	// ========================================================================
 	// >> 2-bit Segment registers
 	// ========================================================================
-	delete m_cs;
-	delete m_ss;
-	delete m_ds;
-	delete m_es;
-	delete m_fs;
-	delete m_gs;
+	DeleteRegister(m_cs);
+	DeleteRegister(m_ss);
+	DeleteRegister(m_ds);
+	DeleteRegister(m_es);
+	DeleteRegister(m_fs);
+	DeleteRegister(m_gs);
 	
 	// ========================================================================
 	// >> 80-bit FPU registers
 	// ========================================================================
-	delete m_st0;
-	delete m_st1;
-	delete m_st2;
-	delete m_st3;
-	delete m_st4;
-	delete m_st5;
-	delete m_st6;
-	delete m_st7;
+	DeleteRegister(m_st0);
+	DeleteRegister(m_st1);
+	DeleteRegister(m_st2);
+	DeleteRegister(m_st3);
+	DeleteRegister(m_st4);
+	DeleteRegister(m_st5);
+	DeleteRegister(m_st6);
+	DeleteRegister(m_st7);
+}
+
+CRegister* CRegisters::CreateRegister(std::list<Register_t>& registers, Register_t reg, int iSize)
+{
+	for(std::list<Register_t>::iterator it=registers.begin(); it != registers.end(); it++)
+	{
+		if ((*it) == reg)
+		{
+			return new CRegister(iSize);
+		}
+	}
+	return NULL;
+}
+
+void CRegisters::DeleteRegister(CRegister* pRegister)
+{
+	if (pRegister)
+	{
+		delete pRegister;
+	}
 }

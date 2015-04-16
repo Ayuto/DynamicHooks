@@ -48,7 +48,7 @@
 CHook::CHook(void* pFunc, ICallingConvention* pConvention)
 {
 	m_pFunc = pFunc;
-	m_pRegisters = new CRegisters();
+	m_pRegisters = new CRegisters(pConvention->GetRegisters());
 	m_pCallingConvention = pConvention;
 
 	unsigned char* pTarget = (unsigned char *) pFunc;
