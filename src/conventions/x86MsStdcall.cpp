@@ -36,6 +36,7 @@
 
 
 // ============================================================================
+// >> x86MsStdcall
 // ============================================================================
 x86MsStdcall::x86MsStdcall(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
 	ICallingConvention(vecArgTypes, returnType, iAlignment)
