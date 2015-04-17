@@ -31,14 +31,13 @@
 // ============================================================================
 // >> INCLUDES
 // ============================================================================
-#include "x86MsCdecl.h"
+#include "x86MsStdcall.h"
 #include <string.h>
 
 
 // ============================================================================
-// >> x86MsCdecl
 // ============================================================================
-x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
+x86MsStdcall::x86MsStdcall(std::vector<DataType_t> vecArgTypes, DataType_t returnType, int iAlignment) : 
 	ICallingConvention(vecArgTypes, returnType, iAlignment)
 {
 	int iSize = GetDataTypeSize(m_returnType);
@@ -52,7 +51,7 @@ x86MsCdecl::x86MsCdecl(std::vector<DataType_t> vecArgTypes, DataType_t returnTyp
 	}
 }
 
-x86MsCdecl::~x86MsCdecl()
+x86MsStdcall::~x86MsStdcall()
 {
 	if (m_pReturnBuffer)
 	{
@@ -60,7 +59,7 @@ x86MsCdecl::~x86MsCdecl()
 	}
 }
 
-std::list<Register_t> x86MsCdecl::GetRegisters()
+std::list<Register_t> x86MsStdcall::GetRegisters()
 {
 	std::list<Register_t> registers;
 
@@ -82,12 +81,19 @@ std::list<Register_t> x86MsCdecl::GetRegisters()
 	return registers;
 }
 
-int x86MsCdecl::GetPopSize()
+int x86MsStdcall::GetPopSize()
 {
-	return 0;
+	int iPopSize = 0;
+
+	for(unsigned int i=0; i < m_vecArgTypes.size(); i++)
+	{
+		iPopSize += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
+	}
+
+	return iPopSize;
 }
 
-void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
+void* x86MsStdcall::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 {
 	int iOffset = 4;
 	for(int i=0; i < iIndex; i++)
@@ -98,11 +104,11 @@ void* x86MsCdecl::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
 }
 
-void x86MsCdecl::ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr)
+void x86MsStdcall::ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr)
 {
 }
 
-void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
+void* x86MsStdcall::GetReturnPtr(CRegisters* pRegisters)
 {
 	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
 		return pRegisters->m_st0->m_pAddress;
@@ -118,7 +124,7 @@ void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
 	return pRegisters->m_eax->m_pAddress;
 }
 
-void x86MsCdecl::ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr)
+void x86MsStdcall::ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr)
 {
 	if (m_pReturnBuffer)
 	{

@@ -85,7 +85,6 @@ int main()
 	// Prepare calling convention
 	std::vector<DataType_t> vecArgTypes;
 	vecArgTypes.push_back(DATA_TYPE_INT);
-	vecArgTypes.push_back(DATA_TYPE_INT);
 
 	// Hook the function
 	CHook* pHook = pHookMngr->HookFunction(

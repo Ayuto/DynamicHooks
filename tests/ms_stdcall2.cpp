@@ -34,7 +34,7 @@
 #include "assert.h"
 
 #include "manager.h"
-#include "conventions/x86MsCdecl.h"
+#include "conventions/x86MsStdcall.h"
 
 
 // ============================================================================
@@ -46,9 +46,9 @@ int g_iPostMyFuncCallCount = 0;
 
 
 // ============================================================================
-// >> cdecl test
+// >> stdcall test
 // ============================================================================
-int MyFunc(int x)
+int __stdcall MyFunc(int x)
 {
 	g_iMyFuncCallCount++;
 	assert(x >= 0 && x <= 3);
@@ -89,7 +89,7 @@ int main()
 	// Hook the function
 	CHook* pHook = pHookMngr->HookFunction(
 		(void *) &MyFunc,
-		new x86MsCdecl(vecArgTypes, DATA_TYPE_INT)
+		new x86MsStdcall(vecArgTypes, DATA_TYPE_INT)
 	);
 
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &PreMyFunc);
@@ -103,6 +103,6 @@ int main()
 	assert(g_iPostMyFuncCallCount == 4);
 	assert(return_value == 3);
 
-	pHookMngr->UnhookAllFunctions();
+	//pHookMngr->UnhookAllFunctions();
 	return 0;
 }

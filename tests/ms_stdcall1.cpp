@@ -34,8 +34,7 @@
 #include "assert.h"
 
 #include "manager.h"
-#include "conventions/x86MsCdecl.h"
-
+#include "conventions/x86MsStdcall.h"
 
 // ============================================================================
 // >> GLOBAL VARIABLES
@@ -46,31 +45,44 @@ int g_iPostMyFuncCallCount = 0;
 
 
 // ============================================================================
-// >> cdecl test
+// >> stdcall test
 // ============================================================================
-int MyFunc(int x)
+int __stdcall MyFunc(int x, int y)
 {
 	g_iMyFuncCallCount++;
-	assert(x >= 0 && x <= 3);
-	if (x == 3)
-		return x;
+	assert(x == 3);
+	assert(y == 10);
 
-	return MyFunc(x + 1);
+	int result = x + y;
+	assert(result == 13);
+
+	return result;
 }
 
 bool PreMyFunc(HookType_t eHookType, CHook* pHook)
 {
 	g_iPreMyFuncCallCount++;
 	int x = pHook->GetArgument<int>(0);
-	assert(x >= 0 && x <= 3);
+	assert(x == 3);
+
+	int y = pHook->GetArgument<int>(1);
+	assert(y == 10);
 	return false;
 }
 
 bool PostMyFunc(HookType_t eHookType, CHook* pHook)
 {
 	g_iPostMyFuncCallCount++;
+	int x = pHook->GetArgument<int>(0);
+	assert(x == 3);
+
+	int y = pHook->GetArgument<int>(1);
+	assert(y == 10);
+
 	int return_value = pHook->GetReturnValue<int>();
-	assert(return_value == 3);
+	assert(return_value == 13);
+	
+	pHook->SetReturnValue<int>(1337);
 	return false;
 }
 
@@ -85,23 +97,24 @@ int main()
 	// Prepare calling convention
 	std::vector<DataType_t> vecArgTypes;
 	vecArgTypes.push_back(DATA_TYPE_INT);
+	vecArgTypes.push_back(DATA_TYPE_INT);
 
 	// Hook the function
 	CHook* pHook = pHookMngr->HookFunction(
 		(void *) &MyFunc,
-		new x86MsCdecl(vecArgTypes, DATA_TYPE_INT)
+		new x86MsStdcall(vecArgTypes, DATA_TYPE_INT)
 	);
 
 	pHook->AddCallback(HOOKTYPE_PRE, (HookHandlerFn *) (void *) &PreMyFunc);
 	pHook->AddCallback(HOOKTYPE_POST, (HookHandlerFn *) (void *) &PostMyFunc);
 
 	// Call the function
-	int return_value = MyFunc(0);
+	int return_value = MyFunc(3, 10);
 	
-	assert(g_iMyFuncCallCount == 4);
-	assert(g_iPreMyFuncCallCount == 4);
-	assert(g_iPostMyFuncCallCount == 4);
-	assert(return_value == 3);
+	assert(g_iMyFuncCallCount == 1);
+	assert(g_iPreMyFuncCallCount == 1);
+	assert(g_iPostMyFuncCallCount == 1);
+	assert(return_value == 1337);
 
 	pHookMngr->UnhookAllFunctions();
 	return 0;

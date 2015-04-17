@@ -10,9 +10,10 @@ Project(DynamicHooks)
 # =============================================================================
 Set(CONVENTION_HEADERS
     conventions/x86MsCdecl.h
-    conventions/x86GccCdecl.h
-
     conventions/x86MsThiscall.h
+    conventions/x86MsStdcall.h
+    
+    conventions/x86GccCdecl.h
     conventions/x86GccThiscall.h
 )
 
@@ -29,6 +30,7 @@ Set(HEADER_FILES
 Set(CONVENTION_SOURCES
     conventions/x86MsCdecl.cpp
     conventions/x86MsThiscall.cpp
+    conventions/x86MsStdcall.cpp
 )
 
 Set(SOURCE_FILES
