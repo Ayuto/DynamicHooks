@@ -40,6 +40,9 @@
 #include "registers.h"
 #include "convention.h"
 
+#include "AsmJit.h"
+using namespace AsmJit;
+
 
 // ============================================================================
 // >> HookType_t
@@ -138,8 +141,13 @@ public:
 		m_pCallingConvention->ReturnPtrChanged(m_pRegisters, pPtr);
 	}
 
-public:
+private:
 	void* CreateBridge();
+
+	void Write_ModifyReturnAddress(Assembler& a);
+	void Write_CallHandler(Assembler& a, HookType_t type);
+	void Write_SaveRegisters(Assembler& a);
+	void Write_RestoreRegisters(Assembler& a);
 
 	void* CreatePostCallback();
 
