@@ -69,7 +69,7 @@ typedef bool (*HookHandlerFn)(HookType_t, CHook*);
 // >> CLASSES
 // ============================================================================
 namespace AsmJit {
-	class Assembler;
+	struct Assembler;
 }
 using namespace AsmJit;
 
