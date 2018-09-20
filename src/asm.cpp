@@ -193,9 +193,9 @@ int copy_bytes(unsigned char *func, unsigned char* dest, int required_len) {
 		else if(!twoByte)
 		{
 			if((opcode & 0xC4) == 0x00 ||
-				(opcode & 0xF4) == 0x60 && ((opcode & 0x0A) == 0x02 || (opcode & 0x09) == 0x09) ||
+				((opcode & 0xF4) == 0x60 && ((opcode & 0x0A) == 0x02 || (opcode & 0x09) == 0x09)) ||
 				(opcode & 0xF0) == 0x80 ||
-				(opcode & 0xF8) == 0xC0 && (opcode & 0x0E) != 0x02 ||
+				((opcode & 0xF8) == 0xC0 && (opcode & 0x0E) != 0x02) ||
 				(opcode & 0xFC) == 0xD0 ||
 				(opcode & 0xF6) == 0xF6)
 			{
@@ -206,11 +206,11 @@ int copy_bytes(unsigned char *func, unsigned char* dest, int required_len) {
 		}
 		else
 		{
-			if((opcode & 0xF0) == 0x00 && (opcode & 0x0F) >= 0x04 && (opcode & 0x0D) != 0x0D ||
+			if(((opcode & 0xF0) == 0x00 && (opcode & 0x0F) >= 0x04 && (opcode & 0x0D) != 0x0D) ||
 				(opcode & 0xF0) == 0x30 ||
 				opcode == 0x77 ||
 				(opcode & 0xF0) == 0x80 ||
-				(opcode & 0xF0) == 0xA0 && (opcode & 0x07) <= 0x02 ||
+				((opcode & 0xF0) == 0xA0 && (opcode & 0x07) <= 0x02) ||
 				(opcode & 0xF8) == 0xC8)
 			{
 				// No mod R/M byte
@@ -286,7 +286,7 @@ int copy_bytes(unsigned char *func, unsigned char* dest, int required_len) {
 				(opcode & 0xFE) == 0xD4 ||   // AAD/AAM
 				(opcode & 0xF8) == 0xE0 ||   // LOOP/JCXZ
 				opcode == 0xEB ||
-				opcode == 0xF6 && (modRM & 0x30) == 0x00)   // TEST
+				(opcode == 0xF6 && (modRM & 0x30) == 0x00))   // TEST
 			{
 				if (dest)
 					*dest++ = *func++;
@@ -311,7 +311,7 @@ int copy_bytes(unsigned char *func, unsigned char* dest, int required_len) {
 				(opcode & 0xFC) == 0xA0 ||
 				(opcode & 0xEE) == 0xA8 ||
 				opcode == 0xC7 ||
-				opcode == 0xF7 && (modRM & 0x30) == 0x00)
+				(opcode == 0xF7 && (modRM & 0x30) == 0x00))
 			{
 				if (dest) {
 					//Fix CALL/JMP offset
@@ -406,7 +406,7 @@ void* eval_jump(void* src) {
 	else if (addr[0] == OP_JMP_BYTE) {
 		addr = &addr[OP_JMP_BYTE_SIZE] + *(char*)&addr[1];
 		//mangled 32bit jump?
-		if (addr[0] = OP_JMP) {
+		if (addr[0] == OP_JMP) {
 			addr = addr + *(int*)&addr[1];
 		}
 		return addr;
