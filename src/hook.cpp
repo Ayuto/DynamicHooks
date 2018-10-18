@@ -272,10 +272,12 @@ void CHook::Write_CallHandler(Assembler& a, HookType_t type)
 	Write_SaveRegisters(a);
 
 	// Call the global hook handler
+	// Subtract 4 bytes to preserve 16-Byte stack alignment for Linux
+	a.sub(esp, 4);
 	a.push(type);
 	a.push(imm((sysint_t) this));
 	a.call((void *&) HookHandler);
-	a.add(esp, 8);
+	a.add(esp, 12);
 }
 
 void CHook::Write_SaveRegisters(Assembler& a)
