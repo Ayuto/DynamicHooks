@@ -445,14 +445,9 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		{
 			switch(GetDataTypeSize(this->m_pCallingConvention->m_returnType))
 			{
-				case SIZE_DWORD: a.fst(dword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
-				case SIZE_QWORD: a.fst(qword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
-				case SIZE_TWORD:
-				{
-					a.fstp(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress));
-					a.fld(st(0));
-					break;
-				}
+				case SIZE_DWORD: a.fstp(dword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_QWORD: a.fstp(qword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_TWORD: a.fstp(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
 			}
 			break;
 		}
@@ -632,7 +627,6 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		// ========================================================================
 		case ST0:
 		{
-			a.fninit();
 			switch(GetDataTypeSize(this->m_pCallingConvention->m_returnType))
 			{
 				case SIZE_DWORD: a.fld(dword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
