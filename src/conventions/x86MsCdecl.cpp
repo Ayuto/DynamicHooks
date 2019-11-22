@@ -120,6 +120,9 @@ void* x86MsCdecl::GetReturnPtr(CRegisters* pRegisters)
 
 void x86MsCdecl::ReturnPtrChanged(CRegisters* pRegisters, void* pReturnPtr)
 {
+	if (m_returnType == DATA_TYPE_FLOAT || m_returnType == DATA_TYPE_DOUBLE)
+		return;
+
 	if (m_pReturnBuffer)
 	{
 		// First half in eax, second half in edx

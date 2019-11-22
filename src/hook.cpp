@@ -441,7 +441,16 @@ void CHook::Write_SaveRegisters(Assembler& a)
 		// ========================================================================
 		// >> 80-bit FPU registers
 		// ========================================================================
-		case ST0: a.fst(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+		case ST0:
+		{
+			switch(GetDataTypeSize(this->m_pCallingConvention->m_returnType))
+			{
+				case SIZE_DWORD: a.fstp(dword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_QWORD: a.fstp(qword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_TWORD: a.fstp(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+			}
+			break;
+		}
 		//case ST1: a.mov(tword_ptr_abs(m_pRegisters->m_st1->m_pAddress), st1); break;
 		//case ST2: a.mov(tword_ptr_abs(m_pRegisters->m_st2->m_pAddress), st2); break;
 		//case ST3: a.mov(tword_ptr_abs(m_pRegisters->m_st3->m_pAddress), st3); break;
@@ -616,7 +625,16 @@ void CHook::Write_RestoreRegisters(Assembler& a)
 		// ========================================================================
 		// >> 80-bit FPU registers
 		// ========================================================================
-		case ST0: a.fld(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+		case ST0:
+		{
+			switch(GetDataTypeSize(this->m_pCallingConvention->m_returnType))
+			{
+				case SIZE_DWORD: a.fld(dword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_QWORD: a.fld(qword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+				case SIZE_TWORD: a.fld(tword_ptr_abs(m_pRegisters->m_st0->m_pAddress)); break;
+			}
+			break;
+		}
 		//case ST1: a.mov(st1, tword_ptr_abs(m_pRegisters->m_st1->m_pAddress)); break;
 		//case ST2: a.mov(st2, tword_ptr_abs(m_pRegisters->m_st2->m_pAddress)); break;
 		//case ST3: a.mov(st3, tword_ptr_abs(m_pRegisters->m_st3->m_pAddress)); break;
