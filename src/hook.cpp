@@ -143,12 +143,24 @@ void* __cdecl CHook::GetReturnAddress(void* pESP)
 	if (m_RetAddr.count(pESP) == 0)
 		puts("ESP not present.");
 
-	return m_RetAddr[pESP];
+	return m_RetAddr[pESP].back();
 }
 
 void __cdecl CHook::SetReturnAddress(void* pRetAddr, void* pESP)
 {
-	m_RetAddr[pESP] = pRetAddr;
+	m_RetAddr[pESP].back() = pRetAddr;
+}
+
+void* __cdecl CHook::PopReturnAddress(void* pESP)
+{
+	void* pRetAddr = GetReturnAddress(pESP);
+	m_RetAddr[pESP].pop_back();
+	return pRetAddr;
+}
+
+void __cdecl CHook::SaveReturnAddress(void* pRetAddr, void* pESP)
+{
+	m_RetAddr[pESP].push_back(pRetAddr);
 }
 
 void* CHook::CreateBridge()
@@ -183,7 +195,7 @@ void* CHook::CreateBridge()
 
 void CHook::Write_ModifyReturnAddress(Assembler& a)
 {
-	// Save scratch registers that are used by SetReturnAddress
+	// Save scratch registers that are used by SaveReturnAddress
 	static void* pEAX = NULL;
 	static void* pECX = NULL;
 	static void* pEDX = NULL;
@@ -196,11 +208,11 @@ void CHook::Write_ModifyReturnAddress(Assembler& a)
 	
 	// Save the original return address by using the current esp as the key.
 	// This should be unique until we have returned to the original caller.
-	void (__cdecl CHook::*SetReturnAddress)(void*, void*) = &CHook::SetReturnAddress;
+	void (__cdecl CHook::*SaveReturnAddress)(void*, void*) = &CHook::SaveReturnAddress;
 	a.push(esp);
 	a.push(eax);
 	a.push(imm((sysint_t) this));
-	a.call((void *&) SetReturnAddress);
+	a.call((void *&) SaveReturnAddress);
 	a.add(esp, 12);
 	
 	// Restore scratch registers
@@ -229,7 +241,7 @@ void* CHook::CreatePostCallback()
 	// Restore the previously saved registers, so any changes will be applied
 	Write_RestoreRegisters(a);
 
-	// Save scratch registers that are used by GetReturnAddress
+	// Save scratch registers that are used by PopReturnAddress
 	static void* pEAX = NULL;
 	static void* pECX = NULL;
 	static void* pEDX = NULL;
@@ -238,10 +250,10 @@ void* CHook::CreatePostCallback()
 	a.mov(dword_ptr_abs(&pEDX), edx);
 	
 	// Get the original return address
-	void* (__cdecl CHook::*GetReturnAddress)(void*) = &CHook::GetReturnAddress;
+	void* (__cdecl CHook::*PopReturnAddress)(void*) = &CHook::PopReturnAddress;
 	a.push(esp);
 	a.push(imm((sysint_t) this));
-	a.call((void *&) GetReturnAddress);
+	a.call((void *&) PopReturnAddress);
 	a.add(esp, 8);
 
 	// Save the original return address

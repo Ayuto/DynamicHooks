@@ -158,6 +158,9 @@ private:
 	void* __cdecl GetReturnAddress(void* pESP);
 	void __cdecl SetReturnAddress(void* pRetAddr, void* pESP);
 
+	void* __cdecl CHook::PopReturnAddress(void* pESP);
+	void __cdecl CHook::SaveReturnAddress(void* pRetAddr, void* pESP);
+
 public:
 	std::map<HookType_t, std::list<HookHandlerFn*> > m_hookHandler;
 
@@ -178,7 +181,7 @@ public:
 	// New return address
 	void* m_pNewRetAddr;
 
-	std::map<void*, void*> m_RetAddr;
+	std::map<void*, std::vector<void*> > m_RetAddr;
 };
 
 #endif // _HOOK_H
