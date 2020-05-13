@@ -143,12 +143,15 @@ void* __cdecl CHook::GetReturnAddress(void* pESP)
 	if (m_RetAddr.count(pESP) == 0)
 		puts("ESP not present.");
 
-	return m_RetAddr[pESP];
+	void* pRetAddr = m_RetAddr[pESP].back();
+	m_RetAddr[pESP].pop_back();
+
+	return pRetAddr;
 }
 
 void __cdecl CHook::SetReturnAddress(void* pRetAddr, void* pESP)
 {
-	m_RetAddr[pESP] = pRetAddr;
+	m_RetAddr[pESP].push_back(pRetAddr);
 }
 
 void* CHook::CreateBridge()
