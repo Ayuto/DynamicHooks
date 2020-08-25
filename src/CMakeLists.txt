@@ -12,6 +12,7 @@ Set(CONVENTION_HEADERS
     conventions/x86MsCdecl.h
     conventions/x86MsThiscall.h
     conventions/x86MsStdcall.h
+    conventions/x86MsFastcall.h
     
     conventions/x86GccCdecl.h
     conventions/x86GccThiscall.h
@@ -31,6 +32,7 @@ Set(CONVENTION_SOURCES
     conventions/x86MsCdecl.cpp
     conventions/x86MsThiscall.cpp
     conventions/x86MsStdcall.cpp
+    conventions/x86MsFastcall.cpp
 )
 
 Set(SOURCE_FILES
