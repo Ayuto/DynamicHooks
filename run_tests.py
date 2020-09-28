@@ -31,19 +31,19 @@ def main(args):
             continue
 
         test_count += 1
-        print 'Testing {0}...'.format(name),
+        print('Testing {0}...'.format(name), end=' ')
         try:
             output = subprocess.check_output(f)
         except subprocess.CalledProcessError as e:
-            print 'Failed with return code {0}!'.format(e.returncode)
-            print 'Output:\n'
-            print e.output
+            print('Failed with return code {0}!'.format(e.returncode))
+            print('Output:\n')
+            print(e.output)
         else:
-            print 'OK!'
+            print('OK!')
             success_count += 1
 
-    print '{0} of {1} tests finished sucessfully.'.format(
-        success_count, test_count)
+    print('{0} of {1} tests finished sucessfully.'.format(
+        success_count, test_count))
 
     if test_count != success_count:
         sys.exit(1)

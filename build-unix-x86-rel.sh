@@ -12,4 +12,4 @@ cmake ../../tests -G"Unix Makefiles"
 make
 cd ../..
 
-python run_tests.py Build/unix-x86-tests
+python3 run_tests.py Build/unix-x86-tests
