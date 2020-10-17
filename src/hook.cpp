@@ -81,6 +81,9 @@ CHook::CHook(void* pFunc, ICallingConvention* pConvention)
 
 	// Write a jump to the bridge
 	WriteJMP((unsigned char *) pFunc, m_pBridge);
+
+	// Flag the convention as hooked and being taken care of
+	m_pCallingConvention->m_bHooked = true;
 }
 
 CHook::~CHook()
