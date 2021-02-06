@@ -50,6 +50,14 @@ x86MsThiscall::x86MsThiscall(std::vector<DataType_t> vecArgTypes, DataType_t ret
 	{
 		m_pReturnBuffer = NULL;
 	}
+
+	m_pOffsets = new int[m_vecArgTypes.size()];
+	int iOffset = 4;
+	for(int i=1; i < m_vecArgTypes.size(); i++)
+	{
+		m_pOffsets[i] = iOffset;
+		iOffset += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
+	}
 }
 
 x86MsThiscall::~x86MsThiscall()
@@ -58,6 +66,8 @@ x86MsThiscall::~x86MsThiscall()
 	{
 		free(m_pReturnBuffer);
 	}
+
+	delete[] m_pOffsets;
 }
 
 std::list<Register_t> x86MsThiscall::GetRegisters()
@@ -102,13 +112,7 @@ void* x86MsThiscall::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 		return pRegisters->m_ecx->m_pAddress;
 	}
 
-	int iOffset = 4;
-	for(int i=1; i < iIndex; i++)
-	{
-		iOffset += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
-	}
-
-	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
+	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + m_pOffsets[iIndex]);
 }
 
 void x86MsThiscall::ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr)

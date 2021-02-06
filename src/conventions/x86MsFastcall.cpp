@@ -50,6 +50,14 @@ x86MsFastcall::x86MsFastcall(std::vector<DataType_t> vecArgTypes, DataType_t ret
 	{
 		m_pReturnBuffer = NULL;
 	}
+
+	m_pOffsets = new int[m_vecArgTypes.size()];
+	int iOffset = 4;
+	for(int i=2; i < m_vecArgTypes.size(); i++)
+	{
+		m_pOffsets[i] = iOffset;
+		iOffset += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
+	}
 }
 
 x86MsFastcall::~x86MsFastcall()
@@ -58,6 +66,8 @@ x86MsFastcall::~x86MsFastcall()
 	{
 		free(m_pReturnBuffer);
 	}
+
+	delete[] m_pOffsets;
 }
 
 std::list<Register_t> x86MsFastcall::GetRegisters()
@@ -118,13 +128,7 @@ void* x86MsFastcall::GetArgumentPtr(int iIndex, CRegisters* pRegisters)
 		return pRegisters->m_edx->m_pAddress;
 	}
 
-	int iOffset = 4;
-	for(int i=2; i < iIndex; i++)
-	{
-		iOffset += GetDataTypeSize(m_vecArgTypes[i], m_iAlignment);
-	}
-
-	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + iOffset);
+	return (void *) (pRegisters->m_esp->GetValue<unsigned long>() + m_pOffsets[iIndex]);
 }
 
 void x86MsFastcall::ArgumentPtrChanged(int iIndex, CRegisters* pRegisters, void* pArgumentPtr)
