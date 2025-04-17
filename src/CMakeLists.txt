@@ -1,7 +1,7 @@
 # =============================================================================
 # >> REQUIREMENTS & PROJECT
 # =============================================================================
-CMake_Minimum_Required(VERSION 2.8)
+CMake_Minimum_Required(VERSION 3.5)
 Project(DynamicHooks)
 
 
@@ -60,12 +60,12 @@ Source_Group("Source Files\\Conventions"    FILES ${CONVENTION_SOURCES})
 # =============================================================================
 # >> COMPILER FLAGS
 # =============================================================================
-# Disable optimization in release mode
 If(WIN32)
+    # Disable optimization in release mode
     Set(CMAKE_CXX_FLAGS_RELEASE "/Od /Ob0")
+Else()
+    Set(CMAKE_CXX_FLAGS "-m32")
 Endif()
-
-Set(CMAKE_CXX_FLAGS "-m32")
 
 # Create a static library
 Add_Library(DynamicHooks STATIC ${DYNAMICHOOKS_FILES})
@@ -81,7 +81,7 @@ Include_Directories(thirdparty/AsmJit/include)
 # >> LINK LIBRARIES
 # =============================================================================
 If(WIN32)
-    Target_Link_Libraries(DynamicHooks ../../thirdparty/AsmJit/lib/AsmJit)
+    Target_Link_Libraries(DynamicHooks ../../thirdparty/AsmJit/lib/asmjit.lib)
 Else()
-    Target_Link_Libraries(DynamicHooks ${CMAKE_SOURCE_DIR}/thirdparty/AsmJit/lib/libAsmJit.a)
+    Target_Link_Libraries(DynamicHooks ${CMAKE_SOURCE_DIR}/thirdparty/AsmJit/lib/libasmjit.a)
 Endif()
